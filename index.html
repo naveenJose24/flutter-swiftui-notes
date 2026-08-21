@@ -456,6 +456,11 @@
   .code-head > span:not(.dots){
     font-family:'IBM Plex Mono', monospace;
     opacity:.9;
+    flex:1;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
   }
   .code-wrap pre{margin:0; padding:18px 20px; overflow-x:auto; font-size:13.2px; -webkit-overflow-scrolling:touch;}
   .code-wrap code{font-family:'IBM Plex Mono', monospace; line-height:1.65;}
@@ -663,7 +668,6 @@
   }
 
   .explain-btn{
-    margin-left:auto;
     display:flex;
     align-items:center;
     gap:6px;
