@@ -1,0 +1,2716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Flutter ⇄ SwiftUI — Revision Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/nord.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/swift.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/dart.min.js"></script>
+
+<style>
+  :root{
+    --bg:#0a0e13;
+    --bg-elevated:#0d1218;
+    --surface:#131a22;
+    --surface-2:#171f28;
+    --border:#232c37;
+    --text:#e8edf3;
+    --text-muted:#8d9aa8;
+    --text-faint:#5c6a78;
+    --flutter:#4fa8ff;
+    --flutter-soft:rgba(79,168,255,.10);
+    --flutter-line:rgba(79,168,255,.35);
+    --swift:#ff8a52;
+    --swift-soft:rgba(255,138,82,.10);
+    --swift-line:rgba(255,138,82,.35);
+    --mint:#5eead4;
+    --mint-soft:rgba(94,234,212,.12);
+    --amber:#f2c265;
+    --radius:14px;
+    --maxw:1180px;
+  }
+
+  html[data-theme="light"]{
+    --bg:#f7f7f4;
+    --bg-elevated:#ffffff;
+    --surface:#ffffff;
+    --surface-2:#f0efe9;
+    --border:#e2e0d8;
+    --text:#1b1f24;
+    --text-muted:#5c6670;
+    --text-faint:#93989f;
+    --flutter:#0c5fc9;
+    --flutter-soft:rgba(12,95,201,.08);
+    --flutter-line:rgba(12,95,201,.30);
+    --swift:#c25417;
+    --swift-soft:rgba(194,84,23,.09);
+    --swift-line:rgba(194,84,23,.30);
+    --mint:#0e8f7c;
+    --mint-soft:rgba(14,143,124,.10);
+    --amber:#a2690a;
+  }
+  html[data-theme="light"] body{
+    background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(12,95,201,.06), transparent 60%),
+      radial-gradient(1000px 480px at 100% 0%, rgba(194,84,23,.06), transparent 55%),
+      var(--bg);
+  }
+  html[data-theme="light"] .code-wrap{ background:#0c1117; }
+  html[data-theme="light"] .code-wrap .code-head{ background:#141a21; border-color:#232c37; color:#8d9aa8; }
+  html[data-theme="light"] .code-wrap.swift .code-head{ color:#ff8a52; }
+  html[data-theme="light"] .code-wrap.dart .code-head{ color:#4fa8ff; }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1100px 520px at 12% -8%, rgba(79,168,255,.10), transparent 60%),
+      radial-gradient(1000px 480px at 100% 0%, rgba(255,138,82,.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.6;
+  }
+
+  h1,h2,h3,h4{
+    font-family:'Space Grotesk', sans-serif;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+
+  code, pre, .mono, .badge, .tag, kbd{
+    font-family:'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  a{color:inherit;}
+
+  ::selection{background:var(--mint-soft); color:var(--text);}
+
+  /* ---------- Layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns:250px minmax(0,1fr);
+    max-width:var(--maxw);
+    margin:0 auto;
+    gap:0;
+  }
+  @media (max-width: 900px){
+    .shell{grid-template-columns:1fr;}
+  }
+
+  /* ---------- Sidebar / TOC ---------- */
+  .toc-toggle{
+    display:none;
+  }
+  aside.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    padding:28px 18px 40px 6px;
+    border-right:1px solid var(--border);
+    scrollbar-width:thin;
+  }
+  aside.toc::-webkit-scrollbar{width:6px;}
+  aside.toc::-webkit-scrollbar-thumb{background:var(--border); border-radius:6px;}
+
+  .toc-brand{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:0 10px 18px 10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    color:var(--text-muted);
+  }
+  .toc-brand .dot-f{color:var(--flutter);}
+  .toc-brand .dot-s{color:var(--swift);}
+
+  .theme-toggle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:30px; height:30px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-muted);
+    cursor:pointer;
+    flex-shrink:0;
+    font-size:14px;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover{ background:var(--surface-2); color:var(--text); }
+  .theme-toggle .icon-sun{ display:none; }
+  .theme-toggle .icon-moon{ display:block; }
+  html[data-theme="light"] .theme-toggle .icon-sun{ display:block; }
+  html[data-theme="light"] .theme-toggle .icon-moon{ display:none; }
+
+  nav.toc-list{display:flex; flex-direction:column; gap:2px;}
+  nav.toc-list a{
+    display:flex;
+    align-items:baseline;
+    gap:8px;
+    padding:8px 10px;
+    border-radius:8px;
+    font-size:13.5px;
+    color:var(--text-muted);
+    text-decoration:none;
+    transition:background .15s ease, color .15s ease;
+    border-left:2px solid transparent;
+  }
+  nav.toc-list a .num{
+    font-size:11px;
+    color:var(--text-faint);
+    min-width:16px;
+  }
+  nav.toc-list a:hover{
+    background:var(--surface);
+    color:var(--text);
+  }
+  nav.toc-list a.active{
+    background:var(--flutter-soft);
+    color:var(--text);
+    border-left-color:var(--flutter);
+  }
+
+  /* ---------- Main content ---------- */
+  main{
+    padding:48px 32px 100px 32px;
+    min-width:0;
+  }
+  @media (max-width: 640px){
+    main{padding:28px 18px 80px 18px;}
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:14px 0 40px 0;
+    border-bottom:1px solid var(--border);
+    margin-bottom:44px;
+  }
+  .hero .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--text-muted);
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:6px 12px;
+    border-radius:999px;
+    margin-bottom:22px;
+  }
+  .hero .eyebrow .pulse{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--mint);
+    box-shadow:0 0 0 3px var(--mint-soft);
+  }
+  .hero h1{
+    font-size:clamp(34px, 6vw, 58px);
+    line-height:1.04;
+    font-weight:700;
+  }
+  .hero h1 .fl{color:var(--flutter);}
+  .hero h1 .sw{color:var(--swift);}
+  .hero h1 .arrow{
+    display:inline-block;
+    color:var(--text-faint);
+    font-weight:500;
+    padding:0 6px;
+    font-size:.7em;
+  }
+  .hero p.sub{
+    margin-top:18px;
+    max-width:640px;
+    color:var(--text-muted);
+    font-size:16.5px;
+  }
+  .hero .meta-row{
+    margin-top:26px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .pill{
+    font-size:12.5px;
+    padding:6px 12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text-muted);
+  }
+  .pill b{color:var(--text); font-weight:600;}
+
+  /* ---------- Section headers ---------- */
+  section.block{
+    margin-bottom:64px;
+    scroll-margin-top:24px;
+  }
+  .sec-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:22px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+  }
+  .sec-head .sec-index{
+    font-size:12px;
+    color:var(--text-faint);
+    display:block;
+    margin-bottom:6px;
+    letter-spacing:.06em;
+  }
+  .sec-head h2{
+    font-size:26px;
+    font-weight:600;
+  }
+  .sec-head p.desc{
+    margin:6px 0 0 0;
+    color:var(--text-muted);
+    font-size:14.5px;
+    max-width:560px;
+  }
+
+  /* ---------- Legend chip used across the doc (signature motif) ---------- */
+  .split-chip{
+    display:inline-flex;
+    align-items:center;
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid var(--border);
+    font-size:12px;
+    flex-shrink:0;
+  }
+  .split-chip span{padding:6px 12px;}
+  .split-chip .f{background:var(--flutter-soft); color:var(--flutter);}
+  .split-chip .s{background:var(--swift-soft); color:var(--swift);}
+
+  /* ---------- Mapping table ---------- */
+  .map-table{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    font-size:14.5px;
+  }
+  .map-table thead th{
+    text-align:left;
+    padding:13px 16px;
+    background:var(--surface-2);
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    color:var(--text-muted);
+    border-bottom:1px solid var(--border);
+  }
+  .map-table thead th.fl{color:var(--flutter);}
+  .map-table thead th.sw{color:var(--swift);}
+  .map-table tbody td{
+    padding:13px 16px;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+  }
+  .map-table tbody tr:last-child td{border-bottom:none;}
+  .map-table tbody tr:hover{background:var(--surface);}
+  .map-table td.concept{color:var(--text-muted); font-size:13.5px;}
+  .map-table td code{
+    font-size:13px;
+    background:var(--bg-elevated);
+    padding:2px 7px;
+    border-radius:6px;
+    border:1px solid var(--border);
+  }
+  .map-table td.fl code{color:var(--flutter); border-color:var(--flutter-line);}
+  .map-table td.sw code{color:var(--swift); border-color:var(--swift-line);}
+  .table-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+
+  /* ---------- Two-column translator card (signature element) ---------- */
+  .translate-card{
+    display:grid;
+    grid-template-columns:1fr 40px 1fr;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin-bottom:16px;
+    background:var(--surface);
+  }
+  @media (max-width:720px){
+    .translate-card{grid-template-columns:1fr; }
+    .translate-card .link-col{display:none;}
+  }
+  .translate-card .side{padding:20px 22px;}
+  .translate-card .side.fl{background:linear-gradient(180deg, var(--flutter-soft), transparent 70%);}
+  .translate-card .side.sw{background:linear-gradient(180deg, var(--swift-soft), transparent 70%);}
+  .translate-card .side .label{
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .translate-card .side.fl .label{color:var(--flutter);}
+  .translate-card .side.sw .label{color:var(--swift);}
+  .translate-card .side code.big{
+    font-size:14.5px;
+    display:block;
+    margin-bottom:6px;
+  }
+  .translate-card .side p{margin:0; color:var(--text-muted); font-size:13.5px;}
+  .translate-card .link-col{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:var(--bg-elevated);
+    border-left:1px solid var(--border);
+    border-right:1px solid var(--border);
+    color:var(--text-faint);
+    font-size:15px;
+  }
+
+  /* ---------- Cards grid (property wrappers) ---------- */
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:16px;
+  }
+  @media (max-width:760px){ .card-grid{grid-template-columns:1fr;} }
+
+  .wcard{
+    border:1px solid var(--border);
+    background:var(--surface);
+    border-radius:var(--radius);
+    padding:20px 22px 22px 22px;
+  }
+  .wcard .wtag{
+    display:inline-block;
+    font-size:13px;
+    color:var(--mint);
+    background:var(--mint-soft);
+    border:1px solid rgba(94,234,212,.3);
+    padding:3px 10px;
+    border-radius:7px;
+    margin-bottom:12px;
+  }
+  .wcard h3{font-size:17px; margin-bottom:8px;}
+  .wcard p{margin:0 0 10px 0; color:var(--text-muted); font-size:14px;}
+  .wcard .fl-equiv{
+    font-size:12.5px;
+    color:var(--text-faint);
+    border-top:1px dashed var(--border);
+    padding-top:10px;
+    margin-top:12px;
+  }
+  .wcard .fl-equiv b{color:var(--flutter); font-weight:600;}
+
+  /* ---------- Code blocks ---------- */
+  .code-wrap{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    margin:14px 0 22px 0;
+    background:#0c1117;
+  }
+  .code-head{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:14px;
+    padding:11px 16px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+    font-size:12px;
+    color:var(--text-muted);
+    position:relative;
+  }
+  .code-head .dots{
+    display:flex;
+    gap:7px;
+    order:-1;
+    flex-shrink:0;
+  }
+  .code-head .dots span{
+    width:11px; height:11px; border-radius:50%;
+    background:var(--border);
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.25);
+  }
+  .code-head .dots span:nth-child(1){ background:#ff5f57; }
+  .code-head .dots span:nth-child(2){ background:#febc2e; }
+  .code-head .dots span:nth-child(3){ background:#28c840; }
+  .code-head > span:not(.dots){
+    font-family:'IBM Plex Mono', monospace;
+    opacity:.9;
+  }
+  .code-wrap pre{margin:0; padding:18px 20px; overflow-x:auto; font-size:13.2px; -webkit-overflow-scrolling:touch;}
+  .code-wrap code{font-family:'IBM Plex Mono', monospace; line-height:1.65;}
+  .code-wrap.swift .code-head{color:var(--swift);}
+  .code-wrap.dart .code-head{color:var(--flutter);}
+
+  .copy-btn{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding:5px 10px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--bg-elevated);
+    color:var(--text-muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .copy-btn:hover{ background:var(--surface); color:var(--text); }
+  .copy-btn .copy-icon{ font-size:12px; line-height:1; }
+  .copy-btn.copied{ color:var(--mint); border-color:rgba(94,234,212,.4); background:var(--mint-soft); }
+
+  /* floating variant for plain <pre> blocks that have no code-head (translator cards) */
+  .copy-btn-floating{
+    position:absolute;
+    top:10px;
+    right:10px;
+    margin-left:0;
+    opacity:0;
+    transition:opacity .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .has-copy:hover .copy-btn-floating,
+  .copy-btn-floating:focus-visible{ opacity:1; }
+  @media (hover:none){ .copy-btn-floating{ opacity:1; } }
+  .has-copy{ position:relative; }
+
+  details.collapse{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--surface);
+    margin-top:8px;
+    overflow:hidden;
+  }
+  details.collapse summary{
+    cursor:pointer;
+    list-style:none;
+    padding:16px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600;
+    font-size:14.5px;
+  }
+  details.collapse summary::-webkit-details-marker{display:none;}
+  details.collapse summary .chev{
+    color:var(--text-faint);
+    transition:transform .2s ease;
+    font-size:13px;
+  }
+  details.collapse[open] summary .chev{transform:rotate(90deg);}
+  details.collapse summary:hover{background:var(--surface-2);}
+  details.collapse .inner{padding:0 20px 20px 20px;}
+
+  /* ---------- Tree / folder blocks ---------- */
+  .tree-pair{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  @media (max-width:760px){ .tree-pair{grid-template-columns:1fr;} }
+  .tree-box{
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--bg-elevated);
+    overflow:hidden;
+  }
+  .tree-box .th{
+    padding:10px 16px;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+  .tree-box.fl .th{color:var(--flutter); background:var(--flutter-soft); border-bottom:1px solid var(--flutter-line);}
+  .tree-box.sw .th{color:var(--swift); background:var(--swift-soft); border-bottom:1px solid var(--swift-line);}
+  .tree-box pre{
+    margin:0; padding:16px 18px;
+    font-size:12.6px;
+    line-height:1.75;
+    color:var(--text-muted);
+    overflow-x:auto;
+  }
+
+  /* ---------- Rule / checklist ---------- */
+  .rule-list{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;}
+  .rule-list li{
+    display:flex;
+    gap:14px;
+    padding:14px 16px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+  }
+  .rule-list .rn{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700;
+    color:var(--mint);
+    font-size:14px;
+    min-width:22px;
+  }
+  .rule-list .rt b{display:block; margin-bottom:2px; font-size:14.5px;}
+  .rule-list .rt span{color:var(--text-muted); font-size:13.5px;}
+
+  /* ---------- Callout ---------- */
+  .callout{
+    display:flex;
+    gap:12px;
+    padding:16px 18px;
+    border-radius:12px;
+    border:1px solid rgba(242,194,101,.35);
+    background:rgba(242,194,101,.08);
+    font-size:13.8px;
+    color:var(--text);
+    margin:18px 0;
+  }
+  .callout .ico{color:var(--amber); font-size:16px;}
+  .callout b{color:var(--amber);}
+
+  /* ---------- Footer ---------- */
+  footer{
+    margin-top:60px;
+    padding-top:26px;
+    border-top:1px solid var(--border);
+    color:var(--text-faint);
+    font-size:12.5px;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+
+  /* ---------- Mobile TOC toggle ---------- */
+  @media (max-width:900px){
+    aside.toc{
+      position:relative;
+      height:auto;
+      border-right:none;
+      border-bottom:1px solid var(--border);
+      padding:16px 18px;
+    }
+    nav.toc-list{
+      display:none;
+      max-height:60vh;
+      overflow-y:auto;
+    }
+    nav.toc-list.open{display:flex;}
+    .toc-toggle{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      width:100%;
+      background:var(--surface);
+      border:1px solid var(--border);
+      color:var(--text);
+      font-family:'Space Grotesk',sans-serif;
+      font-weight:600;
+      font-size:14px;
+      padding:12px 14px;
+      border-radius:10px;
+    }
+  }
+
+  ::-webkit-scrollbar{height:8px;}
+
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ============ SIDEBAR / TOC ============ -->
+  <aside class="toc">
+    <button class="toc-toggle" onclick="document.querySelector('.toc-list').classList.toggle('open')">
+      <span>Contents</span><span>☰</span>
+    </button>
+    <div class="toc-brand">
+      <span class="dot-f">●</span> Flutter <span style="color:var(--text-faint)">⇄</span> <span class="dot-s">●</span> SwiftUI
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light and dark theme" title="Toggle theme">
+        <span class="icon-moon">☾</span><span class="icon-sun">☀</span>
+      </button>
+    </div>
+    <nav class="toc-list">
+      <a href="#mental-model"><span class="num">01</span> Mental model cheatsheet</a>
+      <a href="#structure"><span class="num">02</span> Project structure</a>
+      <a href="#new-project"><span class="num">03</span> New project creation</a>
+      <a href="#packages"><span class="num">04</span> Packages &amp; dependencies</a>
+      <a href="#wrappers"><span class="num">05</span> Property wrappers</a>
+      <a href="#navigation"><span class="num">06</span> Navigation</a>
+      <a href="#networking"><span class="num">07</span> Networking &amp; HTTP</a>
+      <a href="#storage"><span class="num">08</span> Local storage</a>
+      <a href="#animations"><span class="num">09</span> Animations &amp; gestures</a>
+      <a href="#forms"><span class="num">10</span> Forms &amp; validation</a>
+      <a href="#theming"><span class="num">11</span> Theming &amp; dark mode</a>
+      <a href="#localization"><span class="num">12</span> Localization</a>
+      <a href="#accessibility"><span class="num">13</span> Accessibility</a>
+      <a href="#permissions"><span class="num">14</span> Permissions &amp; push</a>
+      <a href="#app-lifecycle"><span class="num">15</span> App lifecycle</a>
+      <a href="#dependency-injection"><span class="num">16</span> Dependency injection</a>
+      <a href="#testing"><span class="num">17</span> Testing</a>
+      <a href="#release"><span class="num">18</span> Release &amp; deployment</a>
+      <a href="#async"><span class="num">19</span> Async &amp; Task bridge</a>
+      <a href="#memory"><span class="num">20</span> Memory &amp; lifecycle</a>
+      <a href="#filetypes"><span class="num">21</span> File types</a>
+      <a href="#reference"><span class="num">22</span> Full code reference</a>
+      <a href="#rules"><span class="num">23</span> 6 translation rules</a>
+    </nav>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main>
+
+    <div class="hero">
+      <div class="eyebrow"><span class="pulse"></span> Revision notes · Bloc/Cubit → Observation</div>
+      <h1><span class="fl">Flutter</span><span class="arrow">⇄</span><span class="sw">SwiftUI</span></h1>
+      <p class="sub">A working Rosetta Stone for moving a Bloc/Cubit brain into modern SwiftUI — file layout, property wrappers, threading, and one complete production-style reference screen.</p>
+      <div class="meta-row">
+        <span class="pill">Target: <b>iOS 17+ · @Observable</b></span>
+        <span class="pill">Pattern: <b>MVVM (ViewModel = Cubit)</b></span>
+        <span class="pill">For: <b>AppGenie iOS build</b></span>
+        <span class="pill">Verified: <b>Aug 2026</b></span>
+      </div>
+    </div>
+
+    <details class="collapse" style="margin-bottom:44px; border-color:rgba(94,234,212,.3);">
+      <summary><span>◈ Fact-check pass (Aug 2026) — what's drifted since these notes were first written</span><span class="chev">▸</span></summary>
+      <div class="inner" style="font-size:13.8px; color:var(--text-muted); display:flex; flex-direction:column; gap:12px;">
+        <p style="margin:0;">Everything in this document targets <b style="color:var(--mint);">iOS 17+ / stable @Observable</b> — that API surface is unchanged and safe to build on today. A few things moved <em>around</em> it since WWDC 2026 (June) that are worth knowing about before you publish or ship against them:</p>
+        <ul style="margin:0; padding-left:18px; display:flex; flex-direction:column; gap:8px;">
+          <li><b style="color:var(--text);">App Store submissions now require Xcode 26+ / iOS 26 SDK.</b> Apple enforced this as a hard minimum starting April 28, 2026 — builds from older Xcode versions are rejected outright. If you're targeting the App Store today, build with Xcode 26 or later regardless of your app's deployment target.</li>
+          <li><b style="color:var(--text);">iOS 26 shipped a system-wide redesign ("Liquid Glass").</b> Standard SwiftUI controls adopt it automatically with no code changes, but custom chrome (toolbars, tab bars, sheets) is worth a visual pass on iOS 26 before release.</li>
+          <li><b style="color:var(--text);">SwiftData gained new APIs at WWDC26</b> — sectioned <code>@Query(sectionBy:)</code>, <code>@Attribute(.codable)</code> for third-party types, and <code>ResultsObserver</code>/<code>HistoryObserver</code> for observing changes outside a View. These ship with <b>iOS 27</b>, which was still in public beta as of this writing — the <code>@Query</code> example in the Local Storage section below uses the stable iOS 17+ syntax on purpose.</li>
+          <li><b style="color:var(--text);">Swift Testing (<code>@Test</code> / <code>#expect</code>) is now the default recommendation</b> for new unit tests as of 2026, not just an alternative — confirmed current. <code>XCTest</code> remains required specifically for UI tests (<code>XCUITest</code>) and performance tests, which Swift Testing still doesn't cover.</li>
+          <li><b style="color:var(--text);">String Catalogs (<code>.xcstrings</code>) are confirmed as the current standard</b> for localization, unchanged since Xcode 15 — this notes set's Localization section reflects that.</li>
+        </ul>
+        <p style="margin:0;">Nothing above changes any of the code in this document — it's all still accurate. Treat this box as the "what to double-check before publishing" list rather than a correction log.</p>
+      </div>
+    </details>
+
+    <!-- ============ 01 MENTAL MODEL ============ -->
+    <section class="block" id="mental-model">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">01 — Foundations</span>
+          <h2>Mental model cheatsheet</h2>
+          <p class="desc">If you understand Flutter's widget tree and reactivity, you already understand ~80% of SwiftUI. This is the direct term-for-term dictionary.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th class="fl">Flutter (Dart)</th>
+              <th class="sw">SwiftUI (Swift)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="concept">Foundational building block</td><td class="fl"><code>Widget</code></td><td class="sw"><code>View</code> (struct)</td></tr>
+            <tr><td class="concept">Render method</td><td class="fl"><code>Widget build(context)</code></td><td class="sw"><code>var body: some View</code></td></tr>
+            <tr><td class="concept">Vertical stack</td><td class="fl"><code>Column(children:[...])</code></td><td class="sw"><code>VStack { ... }</code></td></tr>
+            <tr><td class="concept">Horizontal stack</td><td class="fl"><code>Row(children:[...])</code></td><td class="sw"><code>HStack { ... }</code></td></tr>
+            <tr><td class="concept">Z-axis overlay</td><td class="fl"><code>Stack(children:[...])</code></td><td class="sw"><code>ZStack { ... }</code></td></tr>
+            <tr><td class="concept">Recycled scroll list</td><td class="fl"><code>ListView.builder()</code></td><td class="sw"><code>List { ForEach(...) }</code></td></tr>
+            <tr><td class="concept">Local UI state</td><td class="fl"><code>StatefulWidget + setState()</code></td><td class="sw"><code>@State private var x</code></td></tr>
+            <tr><td class="concept">Extracted logic layer</td><td class="fl"><code>Cubit&lt;State&gt;</code></td><td class="sw"><code>@Observable class ViewModel</code></td></tr>
+            <tr><td class="concept">Scoped provider</td><td class="fl"><code>BlocProvider(create:...)</code></td><td class="sw"><code>@State var model = ViewModel()</code></td></tr>
+            <tr><td class="concept">Deep tree access</td><td class="fl"><code>BlocProvider.of&lt;T&gt;(context)</code></td><td class="sw"><code>@Environment(T.self) var model</code></td></tr>
+            <tr><td class="concept">Async execution</td><td class="fl"><code>Future&lt;T&gt; / async-await</code></td><td class="sw"><code>Task { await ... }</code></td></tr>
+            <tr><td class="concept">Screen navigation</td><td class="fl"><code>Navigator.push() / GoRouter</code></td><td class="sw"><code>NavigationStack + NavigationLink</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ 02 STRUCTURE ============ -->
+    <section class="block" id="structure">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">02 — Layout</span>
+          <h2>Project structure</h2>
+          <p class="desc"><code>lib/</code> becomes conceptual "Groups" in Xcode. This is the standard, production-ready MVVM mapping.</p>
+        </div>
+      </div>
+
+      <div class="tree-pair">
+        <div class="tree-box fl">
+          <div class="th">Flutter — lib/</div>
+          <pre>lib/
+├── main.dart              # entry point
+├── models/
+│   └── todo_item.dart
+├── cubits/                # logic layer
+│   └── todo_cubit.dart
+├── screens/
+│   ├── profile_screen.dart
+│   └── detail_screen.dart
+└── assets/                # via pubspec.yaml</pre>
+        </div>
+        <div class="tree-box sw">
+          <div class="th">Xcode — YourAppName/</div>
+          <pre>YourAppName/
+├── YourAppNameApp.swift   # entry point
+├── Models/
+│   └── TodoItem.swift
+├── ViewModels/            # logic layer
+│   └── TodoViewModel.swift
+├── Views/
+│   ├── ProfileView.swift
+│   └── DetailView.swift
+└── Resources/
+    └── Assets.xcassets</pre>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Swift Package Manager</b> replaces <code>pubspec.yaml</code>. Add dependencies via <em>File → Add Package Dependencies</em> in Xcode — no text file to hand-edit.</div>
+      </div>
+    </section>
+
+    <!-- ============ 03 NEW PROJECT ============ -->
+    <section class="block" id="new-project">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">03 — Getting started</span>
+          <h2>New project creation</h2>
+          <p class="desc">No CLI equivalent to memorize — Xcode's New Project wizard replaces <code>flutter create</code>.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="tree-pair" style="margin-bottom:18px;">
+        <div class="tree-box fl">
+          <div class="th">Flutter — terminal</div>
+          <pre>flutter create my_app
+cd my_app
+flutter pub get
+flutter run
+
+# targeting a device
+flutter devices
+flutter run -d "iPhone 15"</pre>
+        </div>
+        <div class="tree-box sw">
+          <div class="th">Xcode — GUI wizard</div>
+          <pre>File → New → Project
+→ iOS → App
+→ Interface: SwiftUI
+→ Language: Swift
+→ Storage: None / SwiftData
+⌘R to run on Simulator</pre>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Setting</th><th class="fl">Flutter</th><th class="sw">SwiftUI (Xcode wizard)</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">App identifier</td><td class="fl"><code>applicationId</code> in <code>build.gradle</code> / <code>Info.plist</code></td><td class="sw">"Bundle Identifier" field at project creation</td></tr>
+            <tr><td class="concept">Min OS version</td><td class="fl"><code>minSdkVersion</code> / iOS deployment target in Podfile</td><td class="sw">"Minimum Deployments" dropdown</td></tr>
+            <tr><td class="concept">Run on simulator</td><td class="fl"><code>flutter run -d</code></td><td class="sw"><kbd>⌘R</kbd> with a Simulator selected in the toolbar</td></tr>
+            <tr><td class="concept">Hot reload</td><td class="fl">Automatic on save (<code>r</code> in terminal)</td><td class="sw">SwiftUI <code>#Preview</code> canvas updates live; full rebuild for logic changes</td></tr>
+            <tr><td class="concept">App entry file</td><td class="fl"><code>lib/main.dart</code></td><td class="sw"><code>YourAppNameApp.swift</code> — marked <code>@main</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-wrap swift">
+        <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — the @main entry point</span></div>
+        <pre><code class="language-swift">import SwiftUI
+
+@main
+struct YourAppNameApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ProfileView()   // like runApp(MyApp()) in main.dart
+        }
+    }
+}</code></pre>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>No pubspec.yaml equivalent file.</b> Bundle ID, version, permissions, and display name are configured through Xcode's project settings panes (General / Signing &amp; Capabilities) and end up written into <code>Info.plist</code> — you rarely hand-edit that file directly.</div>
+      </div>
+    </section>
+
+    <!-- ============ 04 PACKAGES ============ -->
+    <section class="block" id="packages">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">04 — Dependencies</span>
+          <h2>Packages &amp; dependencies</h2>
+          <p class="desc">pub.dev has one clear winner. Swift has three coexisting systems — know which one a library expects.</p>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI / Xcode</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Package registry</td><td class="fl">pub.dev</td><td class="sw">Swift Package Manager (SPM) — GitHub URLs, no central index</td></tr>
+            <tr><td class="concept">Manifest file</td><td class="fl"><code>pubspec.yaml</code></td><td class="sw"><code>Package.swift</code> / hidden <code>Package.resolved</code> lockfile</td></tr>
+            <tr><td class="concept">Install command</td><td class="fl"><code>flutter pub get</code></td><td class="sw">File → Add Package Dependencies (paste repo URL)</td></tr>
+            <tr><td class="concept">Legacy alternative</td><td class="fl">n/a</td><td class="sw">CocoaPods — <code>Podfile</code> + <code>pod install</code>, still common in older/hybrid projects</td></tr>
+            <tr><td class="concept">Version pinning</td><td class="fl"><code>^1.2.0</code> in pubspec.yaml</td><td class="sw">"Up to Next Major Version" rule set per-package in Xcode</td></tr>
+            <tr><td class="concept">Common HTTP package</td><td class="fl"><code>http</code> or <code>dio</code></td><td class="sw">Usually none needed — <code>URLSession</code> is built in</td></tr>
+            <tr><td class="concept">JSON parsing package</td><td class="fl"><code>json_serializable</code></td><td class="sw">Built in — <code>Codable</code> protocol, no codegen step</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tree-pair">
+        <div class="tree-box fl">
+          <div class="th">pubspec.yaml</div>
+          <pre>dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  provider: ^6.1.0
+  cached_network_image: ^3.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter</pre>
+        </div>
+        <div class="tree-box sw">
+          <div class="th">Xcode → Add Package Dependencies</div>
+          <pre>Paste repo URL, e.g.:
+
+https://github.com/kean/Nuke
+https://github.com/apple/swift-collections
+
+Xcode resolves the version,
+writes Package.resolved,
+and links the target for you —
+no manifest to hand-edit.</pre>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div>Most day-one Flutter dependencies (<code>http</code>, JSON codegen, state management) have <b>no SwiftUI equivalent to install</b> — <code>URLSession</code>, <code>Codable</code>, and <code>@Observable</code> ship in the standard library.</div>
+      </div>
+    </section>
+
+    <!-- ============ 05 WRAPPERS ============ -->
+    <section class="block" id="wrappers">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">05 — Reactivity</span>
+          <h2>Property wrappers</h2>
+          <p class="desc">SwiftUI coordinates state through dedicated wrappers instead of manual <code>emit()</code> / <code>notifyListeners()</code> calls.</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="wcard">
+          <span class="wtag">@State</span>
+          <h3>Local, owned value</h3>
+          <p>Allocates a private, mutable memory cell owned by the view. Use for screen-isolated primitives — booleans, counters, text buffers. Always mark it <code>private</code>.</p>
+          <div class="fl-equiv"><b>Flutter:</b> a variable inside a <code>StatefulWidget</code>, mutated via <code>setState()</code>.</div>
+        </div>
+
+        <div class="wcard">
+          <span class="wtag">@Binding</span>
+          <h3>Reference back to a parent</h3>
+          <p>Passes a direct read/write link to a parent's <code>@State</code>. Use it to build reusable leaf controls like custom switches or field inputs.</p>
+          <div class="fl-equiv"><b>Flutter:</b> passing a value together with an <code>onChanged: (val) {}</code> callback.</div>
+        </div>
+
+        <div class="wcard">
+          <span class="wtag">@Observable</span>
+          <h3>The Cubit itself</h3>
+          <p>A macro that upgrades a plain <code>class</code> into a reactive broadcaster. SwiftUI observes property <em>reads</em> and redraws only the views that touched a changed value.</p>
+          <div class="fl-equiv"><b>Flutter:</b> your <code>Cubit&lt;State&gt;</code> class — but no manual <code>emit()</code> required.</div>
+        </div>
+
+        <div class="wcard">
+          <span class="wtag">@Bindable</span>
+          <h3>Two-way link into a class</h3>
+          <p>Lets a subview generate <code>$</code>-prefixed two-way bindings directly to fields on an injected <code>@Observable</code> instance it doesn't own.</p>
+          <div class="fl-equiv"><b>Flutter:</b> passing an existing Cubit reference into a child widget so it can mutate fields directly.</div>
+        </div>
+
+        <div class="wcard">
+          <span class="wtag">Group</span>
+          <h3>Invisible structural wrapper</h3>
+          <p>Zero layout impact. Lets you attach modifiers to <code>switch</code>/<code>if</code> blocks, and bypasses the 10-child <code>ViewBuilder</code> compiler limit.</p>
+          <div class="fl-equiv"><b>Flutter:</b> returning an un-styled list of widgets without changing geometry.</div>
+        </div>
+
+        <div class="wcard">
+          <span class="wtag">@MainActor</span>
+          <h3>Forces main-thread execution</h3>
+          <p>Swift is multi-threaded by default — <code>await</code> can hop to background threads. Put this on ViewModels so mutations always land safely back on the UI thread.</p>
+          <div class="fl-equiv"><b>Flutter:</b> not needed — Dart's single-threaded event loop hides this for you.</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Ownership rule of thumb</b> — <code>@State private var model = ViewModel()</code> <em>creates and owns</em> the instance. <code>@Bindable var model: ViewModel</code> only <em>accepts</em> a passed-in reference so it can mutate it.</div>
+      </div>
+
+      <h3 style="font-size:16px; margin:34px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <details class="collapse">
+        <summary><span>@State — owns a primitive, redraws on setState-style mutation</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>ContentView.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">struct ContentView: View {
+    // Always mark it 'private' — it's screen-owned
+    @State private var count = 0
+    @State private var isPremiumUser = false
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Score: \(count)")
+                .font(.largeTitle)
+
+            Text(isPremiumUser ? "Premium Account" : "Standard Account")
+                .foregroundColor(isPremiumUser ? .green : .gray)
+
+            Button("Score point") {
+                count += 1              // mutate directly, no setState()
+            }
+            .buttonStyle(.borderedProminent)
+
+            Button("Toggle Membership") {
+                isPremiumUser.toggle()
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding()
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>@Binding — a child mutates a value it doesn't own</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>ParentView.swift + LightSwitchComponent.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">// PARENT — owns the source of truth
+struct ParentView: View {
+    @State private var isLightOn = false
+
+    var body: some View {
+        VStack {
+            Circle()
+                .fill(isLightOn ? .yellow : .gray)
+                .frame(width: 50, height: 50)
+
+            // '$' passes a live reference down, not a copy
+            LightSwitchComponent(isOn: $isLightOn)
+        }
+    }
+}
+
+// CHILD — doesn't own the data, just edits it for the parent
+struct LightSwitchComponent: View {
+    @Binding var isOn: Bool
+
+    var body: some View {
+        Button(isOn ? "Turn Off" : "Turn On") {
+            isOn.toggle()   // this updates the PARENT's circle color
+        }
+    }
+}</code></pre>
+          </div>
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> passing a value down alongside an <code>onChanged: (val) {}</code> callback into a custom widget's constructor.</p>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>@Observable + @MainActor — the Cubit, thread-safe by default</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>TodoViewModel.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">// @MainActor forces every mutation back onto the UI thread,
+// even after an 'await' hops onto a background worker thread.
+@MainActor
+@Observable class TodoViewModel {
+    var tasks: [TodoItem] = []
+
+    func loadRemoteTasks() async {
+        let fetchedData = await NetworkService.fetchData()  // background thread
+
+        // Swift jumps back to Main automatically before this write —
+        // no manual emit() or notifyListeners() needed.
+        self.tasks = fetchedData
+    }
+}</code></pre>
+          </div>
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> Dart's single-threaded event loop hides this problem entirely — <code>@MainActor</code> is Swift's explicit guardrail against threading crashes.</p>
+        </div>
+      </details>
+
+      <details class="collapse" open>
+        <summary><span>@Bindable — pattern 1: parent creates, child mutates</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 4px 0;"><code>@State</code> on the parent <em>creates and owns</em> the instance. <code>@Bindable</code> on the child <em>accepts</em> that same instance so it can generate two-way <code>$</code> bindings back to it.</p>
+          <div class="code-wrap swift">
+            <div class="code-head"><span>ParentDashboardView.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">struct ParentDashboardView: View {
+    // 1. @State CREATES the object here — this view owns it
+    @State private var globalCubit = ProfileViewModel()
+
+    var body: some View {
+        VStack {
+            Text("Logged in as: \(globalCubit.username)")
+
+            // 2. Pass the created instance down into the
+            //    child view's constructor parameter
+            SettingsScreen(viewModel: globalCubit)
+        }
+    }
+}
+
+struct SettingsScreen: View {
+    // 3. @Bindable ACCEPTS the passed object here so you
+    //    can write back to its properties from this screen
+    @Bindable var viewModel: ProfileViewModel
+
+    var body: some View {
+        // 4. This directly mutates the string back in the
+        //    PARENT view's memory — true two-way binding
+        TextField("Change username", text: $viewModel.username)
+    }
+}</code></pre>
+          </div>
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> passing an existing Cubit instance down into a child widget's constructor so a text controller can mutate its fields directly.</p>
+        </div>
+      </details>
+
+      <details class="collapse" open>
+        <summary><span>@Bindable — pattern 2: binding straight into a Form</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 4px 0;">The most common shape in practice — a settings screen with several fields, all bound to one <code>@Observable</code> model.</p>
+          <div class="code-wrap swift">
+            <div class="code-head"><span>ProfileViewModel.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">@Observable class ProfileViewModel {
+    var username: String = "John"
+    var notificationsEnabled: Bool = true
+}
+
+struct SettingsScreen: View {
+    // Allows this screen to create direct '$' binding
+    // properties to the model's fields
+    @Bindable var viewModel: ProfileViewModel
+
+    var body: some View {
+        Form {
+            // Without @Bindable above, writing $viewModel
+            // here would fail to compile
+            TextField("Edit Name", text: $viewModel.username)
+            Toggle("Alerts", isOn: $viewModel.notificationsEnabled)
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="callout" style="margin:12px 0 0 0;">
+            <span class="ico">◆</span>
+            <div><b>Compiler rule</b> — a class passed into a subview is read-only for UI purposes by default. The moment a <code>TextField</code> or <code>Toggle</code> inside that subview needs to <em>write back</em> to it, the property must be marked <code>@Bindable</code>, or the build fails.</div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ 06 NAVIGATION ============ -->
+    <section class="block" id="navigation">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">06 — Routing</span>
+          <h2>Navigation</h2>
+          <p class="desc"><code>NavigationStack</code> replaces both the Navigator and your router package — routes are declared inline, not centrally registered.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Stack container</td><td class="fl"><code>Navigator</code> / <code>MaterialApp</code></td><td class="sw"><code>NavigationStack { }</code></td></tr>
+            <tr><td class="concept">Push a screen</td><td class="fl"><code>Navigator.push(context, route)</code></td><td class="sw"><code>NavigationLink(destination:) { }</code></td></tr>
+            <tr><td class="concept">Pop back</td><td class="fl"><code>Navigator.pop(context)</code></td><td class="sw"><code>@Environment(\.dismiss)</code> then <code>dismiss()</code></td></tr>
+            <tr><td class="concept">Named / declarative routes</td><td class="fl">GoRouter <code>routes: [...]</code></td><td class="sw"><code>.navigationDestination(for: Type.self)</code></td></tr>
+            <tr><td class="concept">Pass data forward</td><td class="fl">Constructor args on the route widget</td><td class="sw">Constructor args on the destination <code>View</code></td></tr>
+            <tr><td class="concept">Programmatic navigation</td><td class="fl">Store a <code>GlobalKey&lt;NavigatorState&gt;</code></td><td class="sw">Bind a <code>NavigationPath</code> and mutate it</td></tr>
+            <tr><td class="concept">Modal sheet</td><td class="fl"><code>showModalBottomSheet()</code></td><td class="sw"><code>.sheet(isPresented:) { }</code></td></tr>
+            <tr><td class="concept">Full-screen modal</td><td class="fl"><code>MaterialPageRoute(fullscreenDialog: true)</code></td><td class="sw"><code>.fullScreenCover(isPresented:) { }</code></td></tr>
+            <tr><td class="concept">Tab bar</td><td class="fl"><code>BottomNavigationBar</code> + <code>IndexedStack</code></td><td class="sw"><code>TabView { }</code></td></tr>
+            <tr><td class="concept">Nested / never double</td><td class="fl">Nested Navigators allowed with keys</td><td class="sw">Never nest two <code>NavigationStack</code>s — one per tab/root only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <details class="collapse">
+        <summary><span>Push with data — inline destination vs typed routes</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Inline destination — fine for a handful of screens</span></div>
+            <pre><code class="language-swift">NavigationStack {
+    List(products) { product in
+        NavigationLink(destination: ProductDetailView(product: product)) {
+            Text(product.name)
+        }
+    }
+    .navigationTitle("Catalog")
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Typed routes — scales like GoRouter's route table</span></div>
+            <pre><code class="language-swift">NavigationStack {
+    List(products) { product in
+        // pass the VALUE, not a built view
+        NavigationLink(product.name, value: product)
+    }
+    // resolves ANY Product value pushed anywhere in this stack
+    .navigationDestination(for: Product.self) { product in
+        ProductDetailView(product: product)
+    }
+    .navigationTitle("Catalog")
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>Programmatic navigation — pop, pop-to-root, push from code</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NavigationPath — like holding your own route stack</span></div>
+            <pre><code class="language-swift">struct RootView: View {
+    // owns the whole back-stack, like a GlobalKey&lt;NavigatorState&gt;
+    @State private var path = NavigationPath()
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            HomeView(onCheckoutSuccess: {
+                path = NavigationPath()   // pop to root, like Navigator.popUntil
+            })
+            .navigationDestination(for: Product.self) { p in ProductDetailView(product: p) }
+            .navigationDestination(for: CartStep.self) { s in CheckoutStepView(step: s) }
+        }
+    }
+}
+
+// pushing from anywhere that holds a Binding&lt;NavigationPath&gt;
+Button("Go to checkout") { path.append(CartStep.shipping) }
+
+// popping one screen from within a pushed view
+@Environment(\.dismiss) private var dismiss
+Button("Back") { dismiss() }</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>Modals — sheet vs full-screen cover</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Sheet — like showModalBottomSheet</span></div>
+            <pre><code class="language-swift">struct HomeView: View {
+    @State private var showingFilters = false
+
+    var body: some View {
+        Button("Filters") { showingFilters = true }
+            .sheet(isPresented: $showingFilters) {
+                FilterSheetView()
+                    .presentationDetents([.medium, .large])  // like a draggable bottom sheet
+            }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Route table equivalent:</b> stacking multiple <code>.navigationDestination(for:)</code> modifiers on one <code>NavigationStack</code> is the closest match to GoRouter's centralized <code>routes: [...]</code> list — each one handles a different value type pushed anywhere in that stack.</div>
+      </div>
+    </section>
+
+    <!-- ============ 07 NETWORKING ============ -->
+    <section class="block" id="networking">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">07 — Data</span>
+          <h2>Networking &amp; HTTP</h2>
+          <p class="desc"><code>URLSession</code> + <code>Codable</code> replace <code>http</code>/<code>dio</code> + <code>json_serializable</code> — both are built into the standard library, no package install required.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">HTTP client</td><td class="fl"><code>http</code> / <code>Dio</code> package</td><td class="sw"><code>URLSession</code> — built in, no import needed</td></tr>
+            <tr><td class="concept">JSON model mapping</td><td class="fl">hand-written <code>fromJson</code>/<code>toJson</code> or codegen</td><td class="sw"><code>Codable</code> protocol — auto-synthesized, zero codegen</td></tr>
+            <tr><td class="concept">Decode a response</td><td class="fl"><code>jsonDecode(res.body)</code></td><td class="sw"><code>JSONDecoder().decode(Type.self, from: data)</code></td></tr>
+            <tr><td class="concept">Error handling</td><td class="fl"><code>try/catch</code> around <code>http.get()</code></td><td class="sw"><code>do/catch</code> around <code>try await URLSession...</code></td></tr>
+            <tr><td class="concept">Loading images from URL</td><td class="fl"><code>Image.network()</code> / <code>cached_network_image</code></td><td class="sw"><code>AsyncImage(url:)</code> — built in, no caching by default</td></tr>
+            <tr><td class="concept">Interceptors / auth headers</td><td class="fl">Dio interceptors</td><td class="sw"><code>URLRequest.setValue(_:forHTTPHeaderField:)</code> per call, or a wrapping service</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <div class="translate-card">
+        <div class="side fl">
+          <div class="label">Flutter — http package</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">final res = await http.get(
+  Uri.parse('https://api.example.com/user'),
+);
+if (res.statusCode == 200) {
+  final json = jsonDecode(res.body);
+  return User.fromJson(json);
+} else {
+  throw Exception('Failed to load');
+}</pre>
+        </div>
+        <div class="link-col">⇄</div>
+        <div class="side sw">
+          <div class="label">SwiftUI — URLSession + Codable</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">let url = URL(string: "https://api.example.com/user")!
+let (data, response) = try await URLSession.shared.data(from: url)
+
+guard let http = response as? HTTPURLResponse,
+      http.statusCode == 200 else {
+    throw URLError(.badServerResponse)
+}
+return try JSONDecoder().decode(User.self, from: data)</pre>
+        </div>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Full example — Codable model + a NetworkService your ViewModel calls</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>User.swift — the model</span></div>
+            <pre><code class="language-swift">// Codable = Decodable + Encodable, synthesized automatically
+// as long as every property type is itself Codable.
+struct User: Codable, Identifiable {
+    let id: Int
+    let name: String
+    let email: String
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NetworkService.swift — a plain async function, no DI framework required</span></div>
+            <pre><code class="language-swift">enum NetworkError: Error { case badResponse, decodingFailed }
+
+struct NetworkService {
+    static func fetchUser(id: Int) async throws -> User {
+        let url = URL(string: "https://api.example.com/users/\(id)")!
+        let (data, response) = try await URLSession.shared.data(from: url)
+
+        guard let http = response as? HTTPURLResponse,
+              (200...299).contains(http.statusCode) else {
+            throw NetworkError.badResponse
+        }
+
+        do {
+            return try JSONDecoder().decode(User.self, from: data)
+        } catch {
+            throw NetworkError.decodingFailed
+        }
+    }
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — calling it from your Cubit-equivalent</span></div>
+            <pre><code class="language-swift">@MainActor
+@Observable class UserViewModel {
+    var user: User?
+    var loadingState: FetchState = .idle
+
+    func loadUser(id: Int) async {
+        loadingState = .loading
+        do {
+            user = try await NetworkService.fetchUser(id: id)
+            loadingState = .success
+        } catch {
+            loadingState = .error(message: "Couldn't load user profile.")
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>No fromJson boilerplate.</b> As long as a struct's properties are all <code>Codable</code> types (<code>String</code>, <code>Int</code>, <code>Bool</code>, arrays, other <code>Codable</code> structs...), conforming to <code>Codable</code> generates the parsing code for you — no <code>build_runner</code>, no generated <code>.g.dart</code> files.</div>
+      </div>
+    </section>
+
+    <!-- ============ 08 STORAGE ============ -->
+    <section class="block" id="storage">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">08 — Persistence</span>
+          <h2>Local storage</h2>
+          <p class="desc">Three separate Flutter packages map to three built-in Apple frameworks — pick by data shape, not habit.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Data shape</th><th class="fl">Flutter</th><th class="sw">SwiftUI / Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Small key-value flags</td><td class="fl"><code>SharedPreferences</code></td><td class="sw"><code>UserDefaults.standard</code></td></tr>
+            <tr><td class="concept">Structured local database</td><td class="fl"><code>sqflite</code> / <code>Hive</code> / <code>Isar</code></td><td class="sw"><code>SwiftData</code> (iOS 17+) or <code>Core Data</code> (older targets)</td></tr>
+            <tr><td class="concept">Secrets / tokens</td><td class="fl"><code>flutter_secure_storage</code></td><td class="sw"><code>Keychain</code> via <code>Security</code> framework</td></tr>
+            <tr><td class="concept">Files / cache directory</td><td class="fl"><code>path_provider</code> + <code>dart:io</code></td><td class="sw"><code>FileManager.default</code> + <code>URL.documentsDirectory</code></td></tr>
+            <tr><td class="concept">Reactive persisted state</td><td class="fl">Hive box listener + <code>ValueListenableBuilder</code></td><td class="sw"><code>@Query</code> property wrapper (SwiftData) — auto-refreshes the view</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <div class="translate-card">
+        <div class="side fl">
+          <div class="label">Flutter — SharedPreferences</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">final prefs = await SharedPreferences.getInstance();
+await prefs.setBool('onboarded', true);
+final seen = prefs.getBool('onboarded') ?? false;</pre>
+        </div>
+        <div class="link-col">⇄</div>
+        <div class="side sw">
+          <div class="label">SwiftUI — UserDefaults / @AppStorage</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">// direct API
+UserDefaults.standard.set(true, forKey: "onboarded")
+let seen = UserDefaults.standard.bool(forKey: "onboarded")
+
+// or, INSIDE a View — auto-persisting @State
+@AppStorage("onboarded") var onboarded = false</pre>
+        </div>
+      </div>
+
+      <details class="collapse">
+        <summary><span>SwiftData — a persisted, queryable model (Hive/Isar equivalent)</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Note.swift — the persisted model</span></div>
+            <pre><code class="language-swift">import SwiftData
+
+@Model
+class Note {
+    var title: String
+    var body: String
+    var createdAt: Date
+
+    init(title: String, body: String) {
+        self.title = title
+        self.body = body
+        self.createdAt = .now
+    }
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NotesListView.swift — @Query auto-refreshes on any change</span></div>
+            <pre><code class="language-swift">struct NotesListView: View {
+    // Like a Hive box listener, but the view redraws itself —
+    // no manual ValueListenableBuilder wiring
+    @Query(sort: \Note.createdAt, order: .reverse) private var notes: [Note]
+    @Environment(\.modelContext) private var context
+
+    var body: some View {
+        List(notes) { note in Text(note.title) }
+            .toolbar {
+                Button("Add") {
+                    context.insert(Note(title: "Untitled", body: ""))
+                }
+            }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>@AppStorage behaves like @State</b> that happens to survive app restarts — great for flags and small settings, not for lists of records. Reach for <code>SwiftData</code> once you're modeling real entities.</div>
+      </div>
+    </section>
+
+    <!-- ============ 09 ANIMATIONS ============ -->
+    <section class="block" id="animations">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">09 — Motion</span>
+          <h2>Animations &amp; gestures</h2>
+          <p class="desc">SwiftUI animates <em>value changes</em>, not widget swaps — you wrap the mutation, not the container.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Implicit animation</td><td class="fl"><code>AnimatedContainer</code></td><td class="sw"><code>.animation(_:value:)</code> modifier</td></tr>
+            <tr><td class="concept">Explicit / triggered animation</td><td class="fl"><code>AnimationController</code> + <code>Tween</code></td><td class="sw"><code>withAnimation { ... }</code> around a state mutation</td></tr>
+            <tr><td class="concept">Shared element transition</td><td class="fl"><code>Hero</code> widget</td><td class="sw"><code>.matchedGeometryEffect(id:in:)</code></td></tr>
+            <tr><td class="concept">Tap gesture</td><td class="fl"><code>GestureDetector(onTap:)</code></td><td class="sw"><code>.onTapGesture { }</code></td></tr>
+            <tr><td class="concept">Drag gesture</td><td class="fl"><code>GestureDetector(onPanUpdate:)</code></td><td class="sw"><code>DragGesture()</code> + <code>.gesture()</code></td></tr>
+            <tr><td class="concept">Physics-based spring</td><td class="fl"><code>SpringSimulation</code></td><td class="sw"><code>.spring(response:dampingFraction:)</code> — built into the curve type</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <details class="collapse">
+        <summary><span>Implicit vs explicit — the two animation styles</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Implicit — like wrapping in AnimatedContainer</span></div>
+            <pre><code class="language-swift">struct BadgeView: View {
+    @State private var isActive = false
+
+    var body: some View {
+        Circle()
+            .fill(isActive ? .green : .gray)
+            .frame(width: isActive ? 60 : 40, height: isActive ? 60 : 40)
+            // ANY change to a value this modifier watches gets animated
+            .animation(.easeInOut(duration: 0.3), value: isActive)
+            .onTapGesture { isActive.toggle() }
+    }
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Explicit — like manually driving an AnimationController</span></div>
+            <pre><code class="language-swift">Button("Add to cart") {
+    // only the mutation inside this closure animates —
+    // nothing else on screen is affected
+    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        cart.items.append(product)
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>Gestures — tap, long-press, and drag</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Composable gesture recognizers</span></div>
+            <pre><code class="language-swift">struct DraggableCard: View {
+    @State private var offset = CGSize.zero
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 16)
+            .fill(.blue.opacity(0.2))
+            .frame(width: 160, height: 100)
+            .offset(offset)
+            .gesture(
+                DragGesture()
+                    .onChanged { value in offset = value.translation }
+                    .onEnded { _ in withAnimation(.spring) { offset = .zero } }
+            )
+            .onTapGesture { print("tapped") }
+            .onLongPressGesture { print("long pressed") }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Mental shift:</b> in Flutter you choose an animation <em>widget</em>. In SwiftUI you animate a <em>value</em> — the same modifier syntax works whether it's a color, a size, an offset, or a corner radius.</div>
+      </div>
+    </section>
+
+    <!-- ============ 10 FORMS ============ -->
+    <section class="block" id="forms">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">10 — Input</span>
+          <h2>Forms &amp; validation</h2>
+          <p class="desc">No <code>Form</code> widget package to reach for — <code>Form</code> is a built-in container, and focus/keyboard control is its own property wrapper.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Form container</td><td class="fl"><code>Form</code> + <code>GlobalKey&lt;FormState&gt;</code></td><td class="sw"><code>Form { }</code> — grouped, styled sections built in</td></tr>
+            <tr><td class="concept">Field validation</td><td class="fl"><code>TextFormField(validator:)</code></td><td class="sw">No built-in validator — check on submit or with <code>.onChange(of:)</code></td></tr>
+            <tr><td class="concept">Keyboard type</td><td class="fl"><code>keyboardType: TextInputType.emailAddress</code></td><td class="sw"><code>.keyboardType(.emailAddress)</code></td></tr>
+            <tr><td class="concept">Focus control</td><td class="fl"><code>FocusNode</code> + <code>FocusScope</code></td><td class="sw"><code>@FocusState</code> property wrapper</td></tr>
+            <tr><td class="concept">Secure field</td><td class="fl"><code>obscureText: true</code></td><td class="sw"><code>SecureField("Password", text:)</code></td></tr>
+            <tr><td class="concept">Submit on return key</td><td class="fl"><code>onFieldSubmitted:</code></td><td class="sw"><code>.onSubmit { }</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>A login form — focus chaining + inline validation</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>LoginView.swift</span></div>
+            <pre><code class="language-swift">struct LoginView: View {
+    @State private var email = ""
+    @State private var password = ""
+    @State private var errorMessage: String?
+
+    // like tracking which FocusNode currently has focus
+    enum Field { case email, password }
+    @FocusState private var focusedField: Field?
+
+    var body: some View {
+        Form {
+            Section {
+                TextField("Email", text: $email)
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .focused($focusedField, equals: .email)
+                    .onSubmit { focusedField = .password }   // return key -> next field
+
+                SecureField("Password", text: $password)
+                    .focused($focusedField, equals: .password)
+                    .onSubmit { submit() }
+            }
+
+            if let errorMessage {
+                Text(errorMessage).foregroundStyle(.red).font(.caption)
+            }
+
+            Button("Sign In", action: submit)
+        }
+        .onAppear { focusedField = .email }   // auto-focus first field, like autofocus: true
+    }
+
+    private func submit() {
+        guard email.contains("@") else {
+            errorMessage = "Enter a valid email address"
+            return
+        }
+        guard password.count >= 8 else {
+            errorMessage = "Password must be at least 8 characters"
+            return
+        }
+        errorMessage = nil
+        // proceed with sign-in
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>No <code>validator:</code> callback.</b> Where <code>TextFormField</code> validates per-field automatically, SwiftUI expects you to check values yourself — usually on submit, as shown above, or reactively with <code>.onChange(of: email)</code> if you want live inline errors as the person types.</div>
+      </div>
+    </section>
+
+    <!-- ============ 11 THEMING ============ -->
+    <section class="block" id="theming">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">11 — Design system</span>
+          <h2>Theming &amp; dark mode</h2>
+          <p class="desc">No central <code>ThemeData</code> object — colors live in the Asset Catalog and adapt automatically per color scheme.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">App-wide theme object</td><td class="fl"><code>ThemeData</code> on <code>MaterialApp</code></td><td class="sw">No single object — colors/fonts are referenced per-view or via Assets</td></tr>
+            <tr><td class="concept">Light/dark aware color</td><td class="fl"><code>Theme.of(context).colorScheme.primary</code></td><td class="sw">Named color set in <code>Assets.xcassets</code> ("Any/Dark" variants)</td></tr>
+            <tr><td class="concept">Read current mode</td><td class="fl"><code>MediaQuery.platformBrightnessOf(context)</code></td><td class="sw"><code>@Environment(\.colorScheme) var scheme</code></td></tr>
+            <tr><td class="concept">Force a mode</td><td class="fl"><code>ThemeMode.dark</code> on <code>MaterialApp</code></td><td class="sw"><code>.preferredColorScheme(.dark)</code></td></tr>
+            <tr><td class="concept">Text style scale</td><td class="fl"><code>TextTheme</code></td><td class="sw"><code>.font(.title)</code>, <code>.headline</code> — semantic Dynamic Type styles</td></tr>
+            <tr><td class="concept">Reusable custom style</td><td class="fl">Extension methods on <code>BuildContext</code></td><td class="sw">Custom <code>ViewModifier</code> + a <code>.myStyle()</code> extension on <code>View</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked examples</h3>
+
+      <details class="collapse">
+        <summary><span>Reacting to dark mode without hardcoding colors</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Reading the environment's color scheme</span></div>
+            <pre><code class="language-swift">struct CardView: View {
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        Text("Weekly summary")
+            .padding()
+            // "BrandSurface" is defined once in Assets.xcassets
+            // with separate Any Appearance / Dark values —
+            // this line never needs an if/else for dark mode
+            .background(Color("BrandSurface"))
+            .foregroundStyle(scheme == .dark ? .white : .black)
+            .cornerRadius(14)
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>Reusable style — the ViewModifier pattern</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>A shared "card" look, applied like a BuildContext extension</span></div>
+            <pre><code class="language-swift">struct CardStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(16)
+            .background(Color("BrandSurface"))
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .shadow(radius: 4, y: 2)
+    }
+}
+
+extension View {
+    func cardStyle() -> some View { modifier(CardStyle()) }
+}
+
+// usage anywhere:
+Text("Total balance").cardStyle()</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Define colors once, in Assets.xcassets.</b> Give each color set both an "Any Appearance" and a "Dark" value there, then reference it by name (<code>Color("BrandSurface")</code>) everywhere — no <code>if (isDark)</code> branching scattered through the UI.</div>
+      </div>
+
+      <div class="callout" style="border-color:rgba(94,234,212,.35); background:var(--mint-soft);">
+        <span class="ico" style="color:var(--mint);">◈</span>
+        <div><b style="color:var(--mint);">Verified Aug 2026:</b> iOS 26 introduced a system-wide visual refresh ("Liquid Glass"). Standard SwiftUI components (buttons, sheets, toolbars, tab bars) adopt it automatically with zero code changes — worth a quick visual check on iOS 26 if you have heavily customized chrome, but nothing above needs rewriting for it.</div>
+      </div>
+    </section>
+
+    <!-- ============ 12 LOCALIZATION ============ -->
+    <section class="block" id="localization">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">12 — i18n</span>
+          <h2>Localization</h2>
+          <p class="desc">String Catalogs replace <code>intl</code> + <code>.arb</code> files — one JSON-backed <code>.xcstrings</code> file with a dedicated Xcode editor, no codegen step.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI / Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Translation package</td><td class="fl"><code>intl</code> + <code>flutter gen-l10n</code></td><td class="sw">Built in — no package, no codegen</td></tr>
+            <tr><td class="concept">Translation file</td><td class="fl"><code>app_en.arb</code>, <code>app_es.arb</code> (one per locale)</td><td class="sw"><code>Localizable.xcstrings</code> — one file, all locales, in Xcode's editor UI</td></tr>
+            <tr><td class="concept">Usage in a widget</td><td class="fl"><code>AppLocalizations.of(context)!.greeting</code></td><td class="sw"><code>Text("greeting")</code> — SwiftUI resolves it implicitly</td></tr>
+            <tr><td class="concept">Usage outside a View</td><td class="fl">Same accessor via <code>context</code></td><td class="sw"><code>String(localized: "greeting")</code></td></tr>
+            <tr><td class="concept">Pluralization rules</td><td class="fl">ICU plural syntax in the <code>.arb</code> file</td><td class="sw">Built into the String Catalog editor per-key, per-locale</td></tr>
+            <tr><td class="concept">Auto-extraction from code</td><td class="fl">Manual — you add every key to the <code>.arb</code> file</td><td class="sw">Automatic — Xcode scans <code>Text</code>/<code>Button</code>/etc. on every build</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Adding a String Catalog and using it</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="tree-pair" style="margin-bottom:14px;">
+            <div class="tree-box fl">
+              <div class="th">Flutter — one .arb per locale</div>
+              <pre>lib/l10n/
+  app_en.arb
+  app_es.arb
+
+// app_en.arb
+{
+  "greeting": "Hello, {name}!",
+  "@greeting": {
+    "placeholders": { "name": {} }
+  }
+}
+
+// usage
+Text(AppLocalizations.of(context)!
+  .greeting(userName))</pre>
+            </div>
+            <div class="tree-box sw">
+              <div class="th">SwiftUI — one .xcstrings, all locales</div>
+              <pre>Resources/
+  Localizable.xcstrings   // JSON, all languages
+
+// SwiftUI resolves the key automatically —
+// no lookup call needed inside a View
+Text("greeting \(userName)")
+
+// outside a View (e.g. in a ViewModel)
+let msg = String(localized: "greeting \(userName)")</pre>
+            </div>
+          </div>
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0;">Add languages from the "+" button inside the <code>.xcstrings</code> editor in Xcode — every key already extracted from your <code>Text</code>/<code>Button</code> views shows up ready for translation, no manual key registration.</p>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Opting a string out of translation:</b> use <code>Text(verbatim: "SKU-4821")</code> for values that should never be sent to translators — usernames, codes, raw data — the equivalent of simply not wrapping a string in <code>AppLocalizations</code>.</div>
+      </div>
+    </section>
+
+    <!-- ============ 13 ACCESSIBILITY ============ -->
+    <section class="block" id="accessibility">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">13 — Inclusive design</span>
+          <h2>Accessibility</h2>
+          <p class="desc">SwiftUI infers a lot from your layout already — most work is fixing a handful of ambiguous cases, not annotating every view.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Screen reader label</td><td class="fl"><code>Semantics(label: '...')</code></td><td class="sw"><code>.accessibilityLabel("...")</code></td></tr>
+            <tr><td class="concept">Extra context / hint</td><td class="fl"><code>Semantics(hint: '...')</code></td><td class="sw"><code>.accessibilityHint("...")</code></td></tr>
+            <tr><td class="concept">Group children into one stop</td><td class="fl"><code>MergeSemantics()</code></td><td class="sw"><code>.accessibilityElement(children: .combine)</code></td></tr>
+            <tr><td class="concept">Hide decorative content</td><td class="fl"><code>ExcludeSemantics()</code></td><td class="sw"><code>.accessibilityHidden(true)</code></td></tr>
+            <tr><td class="concept">Dynamic Type / text scaling</td><td class="fl">Manual — scale with <code>MediaQuery.textScaleFactor</code></td><td class="sw">Automatic for semantic fonts (<code>.body</code>, <code>.title</code>, etc.)</td></tr>
+            <tr><td class="concept">Announce a live change</td><td class="fl"><code>SemanticsService.announce()</code></td><td class="sw"><code>AccessibilityNotification.Announcement</code></td></tr>
+            <tr><td class="concept">Test with a screen reader</td><td class="fl">TalkBack (Android) / VoiceOver (iOS simulator)</td><td class="sw">VoiceOver — <kbd>⌘F5</kbd> on the simulator/device</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Merging a custom row into one VoiceOver stop</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>OrderRow.swift</span></div>
+            <pre><code class="language-swift">struct OrderRow: View {
+    let order: Order
+
+    var body: some View {
+        HStack {
+            Text(order.title)
+            Spacer()
+            Text(order.status).foregroundStyle(.secondary)
+        }
+        // without this, VoiceOver reads the title and status
+        // as two separate stops — merge them into one
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(order.title), \(order.status)")
+        .accessibilityHint("Double tap to view order details")
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Icon-only buttons are the most common miss.</b> A <code>Button</code> containing only an SF Symbol has no readable label by default — always pair it with <code>.accessibilityLabel("Delete")</code> or VoiceOver announces nothing useful.</div>
+      </div>
+    </section>
+
+    <!-- ============ 14 PERMISSIONS ============ -->
+    <section class="block" id="permissions">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">14 — System access</span>
+          <h2>Permissions &amp; push notifications</h2>
+          <p class="desc">No runtime permission-request package — usage strings in <code>Info.plist</code> plus a per-framework request call. Push notifications follow the same pattern, then hand off to APNs.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Permission</th><th class="fl">Flutter</th><th class="sw">SwiftUI / Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Request flow</td><td class="fl"><code>permission_handler</code> package</td><td class="sw">Per-framework request call — no unified package</td></tr>
+            <tr><td class="concept">Camera</td><td class="fl"><code>Permission.camera.request()</code></td><td class="sw"><code>AVCaptureDevice.requestAccess(for: .video)</code></td></tr>
+            <tr><td class="concept">Photo library</td><td class="fl"><code>Permission.photos.request()</code></td><td class="sw"><code>PHPhotoLibrary.requestAuthorization(for:)</code></td></tr>
+            <tr><td class="concept">Location</td><td class="fl"><code>Permission.location.request()</code></td><td class="sw"><code>CLLocationManager().requestWhenInUseAuthorization()</code></td></tr>
+            <tr><td class="concept">Push notifications</td><td class="fl"><code>firebase_messaging</code> request</td><td class="sw"><code>UNUserNotificationCenter.requestAuthorization(options:)</code></td></tr>
+            <tr><td class="concept">Declare the "why" text</td><td class="fl"><code>AndroidManifest.xml</code> + <code>Info.plist</code> usage strings</td><td class="sw"><code>Info.plist</code> keys only — e.g. <code>NSCameraUsageDescription</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Camera permission — the full request + check flow</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>CameraPermission.swift</span></div>
+            <pre><code class="language-swift">import AVFoundation
+
+enum CameraPermission {
+    static func request() async -> Bool {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            return true
+        case .notDetermined:
+            return await AVCaptureDevice.requestAccess(for: .video)
+        case .denied, .restricted:
+            return false
+        @unknown default:
+            return false
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Push notifications, end to end</h3>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Step</th><th class="fl">Flutter</th><th class="sw">Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Register for remote notifications</td><td class="fl"><code>FirebaseMessaging.instance.requestPermission()</code></td><td class="sw"><code>UIApplication.shared.registerForRemoteNotifications()</code></td></tr>
+            <tr><td class="concept">Get the device token</td><td class="fl"><code>FirebaseMessaging.instance.getToken()</code></td><td class="sw"><code>didRegisterForRemoteNotificationsWithDeviceToken</code> delegate callback</td></tr>
+            <tr><td class="concept">Handle a tap on the notification</td><td class="fl"><code>FirebaseMessaging.onMessageOpenedApp</code></td><td class="sw"><code>UNUserNotificationCenterDelegate.userNotificationCenter(_:didReceive:)</code></td></tr>
+            <tr><td class="concept">Foreground presentation</td><td class="fl">Handled automatically by the plugin</td><td class="sw"><code>willPresent</code> delegate method — you choose banner/sound/badge explicitly</td></tr>
+            <tr><td class="concept">Backend delivery</td><td class="fl">Firebase Cloud Messaging (cross-platform)</td><td class="sw">Direct APNs, or FCM if you're already using it for Android too</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse" open>
+        <summary><span>AppDelegate bridge — request permission, register, capture the token</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>PushNotificationManager.swift</span></div>
+            <pre><code class="language-swift">import UIKit
+import UserNotifications
+
+@MainActor
+final class PushNotificationManager: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = PushNotificationManager()
+
+    func requestAuthorization() async -> Bool {
+        let center = UNUserNotificationCenter.current()
+        center.delegate = self
+
+        do {
+            let granted = try await center.requestAuthorization(options: [.alert, .sound, .badge])
+            if granted {
+                // must happen on the main thread — like firebase_messaging does internally
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+            return granted
+        } catch {
+            return false
+        }
+    }
+
+    // called by AppDelegate once APNs hands back a token
+    func didReceiveDeviceToken(_ deviceToken: Data) {
+        let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
+        // send `token` to your backend, same as FirebaseMessaging.instance.getToken()
+        print("APNs device token: \(token)")
+    }
+
+    // notification arrives while the app is in the FOREGROUND
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        willPresent notification: UNNotification
+    ) async -> UNNotificationPresentationOptions {
+        [.banner, .sound, .badge]   // explicit — Flutter's plugin does this for you
+    }
+
+    // user TAPPED the notification (foreground, background, or terminated launch)
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse
+    ) async {
+        let userInfo = response.notification.request.content.userInfo
+        // route to the relevant screen, e.g. push.append(...) on your NavigationPath
+        print("Notification tapped with payload: \(userInfo)")
+    }
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — wiring it in via AppDelegate adaptor</span></div>
+            <pre><code class="language-swift">import SwiftUI
+
+final class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
+        PushNotificationManager.shared.didReceiveDeviceToken(deviceToken)
+    }
+}
+
+@main
+struct YourAppNameApp: App {
+    // SwiftUI's App protocol has no native push-token delegate,
+    // so it bridges to UIKit's AppDelegate for this one thing
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+    var body: some Scene {
+        WindowGroup {
+            ProfileView()
+                .task { _ = await PushNotificationManager.shared.requestAuthorization() }
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Missing the Info.plist key = instant crash.</b> Every permission needs a matching <code>NS...UsageDescription</code> string in <code>Info.plist</code> — if it's missing, iOS terminates the app the moment you request that permission, with no dialog shown at all.</div>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Push notifications need real capabilities, not just code.</b> Enable "Push Notifications" and "Background Modes → Remote notifications" under Signing &amp; Capabilities in Xcode, and push testing only works on a physical device — the Simulator can't receive real APNs pushes (it can simulate local ones via a drag-and-drop <code>.apns</code> file).</div>
+      </div>
+    </section>
+
+    <!-- ============ 15 APP LIFECYCLE ============ -->
+    <section class="block" id="app-lifecycle">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">15 — Foreground/background</span>
+          <h2>App lifecycle</h2>
+          <p class="desc">One environment value replaces the observer pattern — no subscribe/unsubscribe dance.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Observe app state changes</td><td class="fl"><code>WidgetsBindingObserver</code> + <code>didChangeAppLifecycleState</code></td><td class="sw"><code>@Environment(\.scenePhase)</code></td></tr>
+            <tr><td class="concept">States available</td><td class="fl"><code>resumed / inactive / paused / detached</code></td><td class="sw"><code>.active / .inactive / .background</code></td></tr>
+            <tr><td class="concept">React to a transition</td><td class="fl">Override the observer method, check the enum</td><td class="sw"><code>.onChange(of: scenePhase) { old, new in }</code></td></tr>
+            <tr><td class="concept">Background task (finish work after backgrounding)</td><td class="fl"><code>flutter_background_service</code> / native platform channel</td><td class="sw"><code>BGTaskScheduler</code> — register + schedule a <code>BGAppRefreshTask</code></td></tr>
+            <tr><td class="concept">React to memory warnings</td><td class="fl"><code>didHaveMemoryPressure</code></td><td class="sw"><code>UIApplication.didReceiveMemoryWarningNotification</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Pausing work when the app backgrounds</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>RootView.swift</span></div>
+            <pre><code class="language-swift">struct RootView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var viewModel = SyncViewModel()
+
+    var body: some View {
+        ProfileView()
+            .onChange(of: scenePhase) { oldPhase, newPhase in
+                switch newPhase {
+                case .active:
+                    Task { await viewModel.resumeSync() }
+                case .background:
+                    viewModel.pauseSync()
+                    viewModel.persistDraftState()
+                case .inactive:
+                    break   // brief transition state — e.g. control center pulled down
+                @unknown default:
+                    break
+                }
+            }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>No separate "detached" state.</b> SwiftUI's <code>scenePhase</code> only has three cases — when the app is force-quit or killed by the system, there's no callback at all, exactly like Flutter's <code>detached</code> state gives you almost nothing actionable either.</div>
+      </div>
+    </section>
+
+    <!-- ============ 16 DEPENDENCY INJECTION ============ -->
+    <section class="block" id="dependency-injection">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">16 — Architecture</span>
+          <h2>Dependency injection</h2>
+          <p class="desc">No DI container package required for most apps — <code>@Environment</code> plus plain initializer injection covers the common cases.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">DI container package</td><td class="fl"><code>get_it</code> / <code>riverpod</code> / <code>provider</code></td><td class="sw">Usually none — <code>@Environment</code> + initializers</td></tr>
+            <tr><td class="concept">App-wide singleton service</td><td class="fl"><code>GetIt.instance.registerSingleton()</code></td><td class="sw">A plain <code>static let shared</code>, or injected via <code>.environment()</code></td></tr>
+            <tr><td class="concept">Inject into a screen</td><td class="fl">Constructor param, or <code>context.read&lt;T&gt;()</code></td><td class="sw">Constructor param, or <code>@Environment(T.self)</code></td></tr>
+            <tr><td class="concept">Swap real vs. mock for tests</td><td class="fl">Register a fake in <code>GetIt</code> before the test</td><td class="sw">Pass a protocol-typed mock into the initializer directly</td></tr>
+            <tr><td class="concept">Scoped to one feature only</td><td class="fl"><code>ProxyProvider</code> further down the tree</td><td class="sw"><code>.environment()</code> attached at a lower view, not the root</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <details class="collapse">
+        <summary><span>Protocol-based service + environment injection (the testable pattern)</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserServiceProtocol.swift — the abstraction, like an abstract repository</span></div>
+            <pre><code class="language-swift">protocol UserServiceProtocol {
+    func fetchUser(id: Int) async throws -> User
+}
+
+struct LiveUserService: UserServiceProtocol {
+    func fetchUser(id: Int) async throws -> User {
+        try await NetworkService.fetchUser(id: id)
+    }
+}
+
+struct MockUserService: UserServiceProtocol {
+    func fetchUser(id: Int) async throws -> User {
+        User(id: id, name: "Test User", email: "test@example.com")
+    }
+}</code></pre>
+          </div>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — depends on the protocol, not the concrete type</span></div>
+            <pre><code class="language-swift">@MainActor
+@Observable class UserViewModel {
+    private let userService: UserServiceProtocol
+    var user: User?
+
+    // constructor injection — same idea as passing a repository
+    // into a Cubit's constructor in Flutter
+    init(userService: UserServiceProtocol = LiveUserService()) {
+        self.userService = userService
+    }
+
+    func load(id: Int) async {
+        user = try? await userService.fetchUser(id: id)
+    }
+}
+
+// production
+let vm = UserViewModel()
+
+// test — swap the dependency, no container needed
+let testVM = UserViewModel(userService: MockUserService())</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>Reach for @Environment only for things every screen might need</b> — a logged-in user session, a theme, an analytics client. For everything else, plain constructor injection (as above) is simpler to trace and easier to test than routing it through the environment.</div>
+      </div>
+    </section>
+
+    <!-- ============ 17 TESTING ============ -->
+    <section class="block" id="testing">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">17 — Quality</span>
+          <h2>Testing</h2>
+          <p class="desc">Apple's newer <code>Testing</code> framework (Swift 6) reads a lot like <code>flutter_test</code> — <code>XCTest</code> is still the safe default for wider tooling support.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">Swift</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Unit test target</td><td class="fl"><code>test/</code> + <code>flutter_test</code></td><td class="sw"><code>YourAppNameTests/</code> + <code>XCTest</code> or <code>Testing</code></td></tr>
+            <tr><td class="concept">Assertion</td><td class="fl"><code>expect(value, equals(x))</code></td><td class="sw"><code>XCTAssertEqual(value, x)</code> / <code>#expect(value == x)</code></td></tr>
+            <tr><td class="concept">Async test</td><td class="fl"><code>test('...', () async { await ... })</code></td><td class="sw"><code>func test...() async throws { ... }</code></td></tr>
+            <tr><td class="concept">UI / widget test</td><td class="fl"><code>testWidgets()</code> + <code>WidgetTester</code></td><td class="sw">XCUITest — separate <code>YourAppNameUITests</code> target</td></tr>
+            <tr><td class="concept">Run tests</td><td class="fl"><code>flutter test</code></td><td class="sw"><kbd>⌘U</kbd> in Xcode, or <code>xcodebuild test</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">Worked example</h3>
+
+      <div class="translate-card">
+        <div class="side fl">
+          <div class="label">Flutter — flutter_test</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">test('addNewTask adds a task', () {
+  final cubit = TodoCubit();
+  cubit.taskInputBuffer = 'Buy milk';
+  cubit.addNewTask();
+  expect(cubit.state.tasks.length, 1);
+});</pre>
+        </div>
+        <div class="link-col">⇄</div>
+        <div class="side sw">
+          <div class="label">Swift — the new Testing framework</div>
+          <pre style="white-space:pre-wrap; margin:0; font-family:'IBM Plex Mono',monospace; font-size:12.8px; color:var(--text-muted);">import Testing
+@testable import YourAppName
+
+@Test func addNewTaskAddsATask() {
+    let vm = TodoViewModel()
+    vm.taskInputBuffer = "Buy milk"
+    vm.addNewTask()
+    #expect(vm.tasks.count == 1)
+}</pre>
+        </div>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>@MainActor ViewModels need an async test.</b> Since your ViewModel is pinned to the main actor, calling its methods from a test may require marking the test function <code>async</code> and awaiting the call — the compiler will tell you exactly where.</div>
+      </div>
+    </section>
+
+    <!-- ============ 18 RELEASE ============ -->
+    <section class="block" id="release">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">18 — Shipping</span>
+          <h2>Release &amp; deployment</h2>
+          <p class="desc">This is the section furthest from Flutter's CI/CD model — no <code>fastlane</code>-only path, and Apple's tooling/timeline requirements shift more often than the language does.</p>
+        </div>
+        <div class="split-chip"><span class="f">Flutter</span><span class="s">SwiftUI</span></div>
+      </div>
+
+      <div class="callout" style="border-color:rgba(94,234,212,.35); background:var(--mint-soft);">
+        <span class="ico" style="color:var(--mint);">◈</span>
+        <div><b style="color:var(--mint);">Verified Aug 2026 — current hard requirement:</b> since April 28, 2026, Apple rejects any App Store build not compiled with <b>Xcode 26 or later using the iOS 26 SDK</b> — regardless of your app's actual deployment target. If you're building against an older Xcode toolchain in CI, upload will fail outright, not just get flagged in review.</div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>Concept</th><th class="fl">Flutter</th><th class="sw">SwiftUI / Xcode</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">Build for release</td><td class="fl"><code>flutter build ipa</code></td><td class="sw">Product → Archive in Xcode, or <code>xcodebuild archive</code></td></tr>
+            <tr><td class="concept">Signing</td><td class="fl">Fastlane <code>match</code>, or manual provisioning profiles</td><td class="sw">Automatic signing in Xcode, or Fastlane <code>match</code> — same tool works for both</td></tr>
+            <tr><td class="concept">Beta distribution</td><td class="fl">Firebase App Distribution / TestFlight (via Codemagic etc.)</td><td class="sw">TestFlight — builds expire after 90 days</td></tr>
+            <tr><td class="concept">CI/CD</td><td class="fl">Codemagic, GitHub Actions + custom runners</td><td class="sw">Xcode Cloud (native, 25 free compute hrs/mo) or Fastlane + GitHub Actions on a macOS runner</td></tr>
+            <tr><td class="concept">Store listing config</td><td class="fl">Google Play Console + App Store Connect (two consoles)</td><td class="sw">App Store Connect only</td></tr>
+            <tr><td class="concept">Privacy declarations</td><td class="fl">Play Data Safety form</td><td class="sw">App Privacy "nutrition label" + a Privacy Manifest per third-party SDK</td></tr>
+            <tr><td class="concept">Review turnaround</td><td class="fl">Google Play — hours to a few days</td><td class="sw">Apple App Review — ~90% within 24 hours as of 2026, longer for complex/flagged apps</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="font-size:16px; margin:30px 0 14px 0; color:var(--text-muted); font-weight:600; letter-spacing:.02em;">The submission checklist</h3>
+
+      <ol class="rule-list" style="padding:0; margin:0 0 22px 0;">
+        <li><span class="rn">01</span><div class="rt"><b>Enroll in the Apple Developer Program</b><span>$99/year. Individual accounts use your legal name; organization accounts need a D-U-N-S number and show a company name on the Store.</span></div></li>
+        <li><span class="rn">02</span><div class="rt"><b>Register a Bundle ID and create the App Record</b><span>In App Store Connect — this is the one-time setup step that minor updates skip.</span></div></li>
+        <li><span class="rn">03</span><div class="rt"><b>Build with the current required Xcode/SDK</b><span>Xcode 26+ / iOS 26 SDK as of this writing (see the verified box above) — check developer.apple.com/news for the current baseline before every release, since it moves roughly once a year.</span></div></li>
+        <li><span class="rn">04</span><div class="rt"><b>Archive and upload the same build to TestFlight first</b><span>Test the exact binary you intend to ship, not a separate debug build — this matches uploading a signed release APK/AAB to Play's internal track before promoting it.</span></div></li>
+        <li><span class="rn">05</span><div class="rt"><b>Declare API usage in your Privacy Manifest</b><span>Any "required reason" API your app or its third-party SDKs touch (file timestamps, UserDefaults, disk space, etc.) needs an approved reason code — a common, fully automatic rejection cause if skipped.</span></div></li>
+        <li><span class="rn">06</span><div class="rt"><b>Fill in App Privacy details and the age rating questionnaire</b><span>Both are checked against your actual app behavior during review, not just taken at face value.</span></div></li>
+        <li><span class="rn">07</span><div class="rt"><b>Submit for review</b><span>Most builds clear within 24 hours; expedited review exists for critical fixes but isn't guaranteed.</span></div></li>
+      </ol>
+
+      <details class="collapse">
+        <summary><span>Fastlane — the one CI/CD tool that works the same for both stacks</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 10px 0;">If your AppGenie pipeline already runs Fastlane for Android builds, the iOS half of that setup carries over almost unchanged — <code>match</code> for signing, <code>pilot</code> for TestFlight, <code>deliver</code> for App Store Connect metadata.</p>
+          <div class="code-wrap swift">
+            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>fastlane/Fastfile</span></div>
+            <pre><code class="language-swift">lane :beta do
+  match(type: "appstore")                 # pulls signing certs from your shared repo
+  build_app(scheme: "YourAppName")        # archives with the project's current Xcode
+  upload_to_testflight(skip_waiting_for_build_processing: true)
+end
+
+lane :release do
+  match(type: "appstore")
+  build_app(scheme: "YourAppName")
+  upload_to_app_store(
+    submit_for_review: true,
+    automatic_release: false              # you flip the switch manually after review
+  )
+end</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div><b>TestFlight builds expire after 90 days.</b> A build sitting untested for three months silently stops being installable — worth a calendar reminder if a beta cycle stalls, since testers won't get an obvious error, the build just disappears as an option.</div>
+      </div>
+    </section>
+
+    <!-- ============ 19 ASYNC ============ -->
+    <section class="block" id="async">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">19 — Concurrency</span>
+          <h2>Async &amp; the Task bridge</h2>
+          <p class="desc">Button actions in SwiftUI are strictly synchronous closures — you can't mark one <code>async</code> directly. <code>Task {}</code> is the bridge into an async context.</p>
+        </div>
+      </div>
+
+      <div class="translate-card">
+        <div class="side fl">
+          <div class="label">Flutter</div>
+          <code class="big">onPressed: () async { await cubit.fetch(); }</code>
+          <p>Dart lets you mark the callback itself as <code>async</code> — no wrapper needed.</p>
+        </div>
+        <div class="link-col">⇄</div>
+        <div class="side sw">
+          <div class="label">SwiftUI</div>
+          <code class="big">Button("Load") { Task { await vm.fetch() } }</code>
+          <p>Swift needs an explicit sandbox to open the async lane inside a synchronous closure.</p>
+        </div>
+      </div>
+
+      <div class="code-wrap swift">
+        <div class="code-head"><span>ProfileView.swift — auto-fire on appear</span><span class="dots"><span></span><span></span><span></span></span></div>
+        <pre><code class="language-swift">struct ProfileView: View {
+    @State private var viewModel = ProfileViewModel()
+
+    var body: some View {
+        Text("Profile Screen Layout")
+            .task {
+                // Fires automatically on appear.
+                // Auto-cancels if the user navigates away mid-request.
+                await viewModel.fetchProfileData()
+            }
+    }
+}</code></pre>
+      </div>
+
+      <p style="color:var(--text-muted); font-size:14px;"><code>.task { }</code> is the closest match to firing a Cubit's initial load inside a screen's <code>initState()</code> — except it also handles cancellation for free.</p>
+    </section>
+
+    <!-- ============ 20 MEMORY ============ -->
+    <section class="block" id="memory">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">20 — Lifecycle</span>
+          <h2>Memory &amp; lifecycle</h2>
+          <p class="desc">No more manual <code>bloc.close()</code>. Swift's ARC handles teardown automatically the moment a view leaves the navigation stack.</p>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead>
+            <tr><th>Behavior</th><th class="fl">Flutter (Dart)</th><th class="sw">SwiftUI (Swift)</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="concept">Memory model</td><td class="fl">Garbage Collector (GC)</td><td class="sw">Automatic Reference Counting (ARC)</td></tr>
+            <tr><td class="concept">Cleanup trigger</td><td class="fl">Manual <code>bloc.close()</code></td><td class="sw">Automatic — pointer count hits zero on pop</td></tr>
+            <tr><td class="concept">Screen mount</td><td class="fl"><code>initState()</code></td><td class="sw"><code>.onAppear { }</code></td></tr>
+            <tr><td class="concept">Screen unmount</td><td class="fl"><code>dispose()</code></td><td class="sw"><code>.onDisappear { }</code></td></tr>
+            <tr><td class="concept">Explicit destructor</td><td class="fl">n/a</td><td class="sw"><code>deinit { }</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <span class="ico">◆</span>
+        <div>Use <b><code>deinit {}</code></b> only to verify teardown or clean up persistent items like open sockets and tracking loops — not for routine state cleanup, which ARC already handles.</div>
+      </div>
+    </section>
+
+    <!-- ============ 21 FILE TYPES ============ -->
+    <section class="block" id="filetypes">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">21 — Tooling</span>
+          <h2>File types in an Xcode project</h2>
+          <p class="desc">Relevant if bridging into an existing Objective-C codebase (e.g. a legacy UIKit module) rather than a pure SwiftUI app.</p>
+        </div>
+      </div>
+
+      <div class="table-scroll">
+        <table class="map-table">
+          <thead><tr><th>File type</th><th>Extension</th><th>Used for</th></tr></thead>
+          <tbody>
+            <tr><td class="concept">SwiftUI view</td><td class="sw"><code>.swift</code></td><td class="concept">Layout + logic in one file — live Canvas preview</td></tr>
+            <tr><td class="concept">Storyboard</td><td class="sw"><code>.storyboard</code></td><td class="concept">Legacy visual XML layout — still standard for Objective-C/UIKit</td></tr>
+            <tr><td class="concept">XIB</td><td class="sw"><code>.xib</code></td><td class="concept">Single-screen visual layout, same era as storyboards</td></tr>
+            <tr><td class="concept">Objective-C</td><td class="sw"><code>.h / .m</code></td><td class="concept">Header + implementation — requires UIKit, not SwiftUI-compatible directly</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="color:var(--text-muted); font-size:14px;">Storyboards persist mainly in large legacy or Objective-C-only codebases — merge conflicts on the generated XML and slower Xcode load times are the usual reasons teams migrate off them.</p>
+    </section>
+
+    <!-- ============ 22 FULL REFERENCE ============ -->
+    <section class="block" id="reference">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">22 — Worked example</span>
+          <h2>Full code reference</h2>
+          <p class="desc">One cohesive, production-style screen: model, <code>@Observable</code> ViewModel, async loading states, a recycled list with swipe-to-delete, and routed navigation.</p>
+        </div>
+      </div>
+
+      <details class="collapse" open>
+        <summary><span>TodoItem.swift &amp; FetchState — data layer</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>Models</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">struct TodoItem: Identifiable {
+    let id = UUID()          // auto-managed row-tracking id
+    let title: String
+    var isCompleted: Bool
+}
+
+/// Maps directly to a Bloc/Cubit state enum.
+enum FetchState {
+    case idle
+    case loading
+    case success
+    case error(message: String)   // associated value, like a Dart sealed class field
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>TodoViewModel.swift — the Cubit</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>ViewModel · @MainActor + @Observable</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">@MainActor
+@Observable class TodoViewModel {
+    var tasks: [TodoItem] = []
+    var loadingState: FetchState = .idle
+    var taskInputBuffer: String = ""
+
+    func loadRemoteTasks() async {
+        loadingState = .loading
+
+        do {
+            try await Task.sleep(nanoseconds: 1_200_000_000) // simulated network delay
+
+            tasks = [
+                TodoItem(title: "Learn SwiftUI Basics", isCompleted: true),
+                TodoItem(title: "Master State & ViewModels", isCompleted: true),
+                TodoItem(title: "Build Scrollable Lists & Feeds", isCompleted: false),
+                TodoItem(title: "Implement Navigation Architecture", isCompleted: false)
+            ]
+            loadingState = .success
+        } catch {
+            loadingState = .error(message: "Failed to download cloud records.")
+        }
+    }
+
+    func addNewTask() {
+        guard !taskInputBuffer.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        tasks.append(TodoItem(title: taskInputBuffer, isCompleted: false))
+        taskInputBuffer = ""
+    }
+
+    func deleteItems(at offsets: IndexSet) {
+        tasks.remove(atOffsets: offsets)
+    }
+
+    deinit {
+        print("ViewModel cleared from memory — zero manual close() calls.")
+    }
+}</code></pre>
+          </div>
+        </div>
+      </details>
+
+      <details class="collapse">
+        <summary><span>ProfileView.swift — root screen</span><span class="chev">▸</span></summary>
+        <div class="inner">
+          <div class="code-wrap swift">
+            <div class="code-head"><span>Root view · state machine + list + form</span><span class="dots"><span></span><span></span><span></span></span></div>
+            <pre><code class="language-swift">struct ProfileView: View {
+    @State private var viewModel = TodoViewModel()
+
+    var body: some View {
+        NavigationStack {
+            VStack {
+                // --- input row ---
+                VStack(spacing: 8) {
+                    @Bindable var bindableModel = viewModel
+                    HStack {
+                        TextField("Create a new task...", text: $bindableModel.taskInputBuffer)
+                            .textFieldStyle(.roundedBorder)
+                        Button(action: { viewModel.addNewTask() }) {
+                            Image(systemName: "plus.circle.fill").font(.title2)
+                        }
+                    }
+                }
+                .padding()
+
+                // --- state machine (BlocBuilder equivalent) ---
+                Group {
+                    switch viewModel.loadingState {
+                    case .idle:
+                        ContentUnavailableView("No Sync Active",
+                            systemImage: "tray.and.arrow.down",
+                            description: Text("Trigger sync below."))
+
+                    case .loading:
+                        ProgressView("Loading...").padding()
+
+                    case .error(let message):
+                        ContentUnavailableView("Connection Failed",
+                            systemImage: "wifi.exclamationmark",
+                            description: Text(message))
+                            .foregroundColor(.red)
+
+                    case .success:
+                        List {
+                            ForEach(viewModel.tasks.indices, id: \.self) { index in
+                                HStack {
+                                    Button {
+                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.6)) {
+                                            viewModel.tasks[index].isCompleted.toggle()
+                                        }
+                                    } label: {
+                                        Image(systemName: viewModel.tasks[index].isCompleted
+                                              ? "checkmark.circle.fill" : "circle")
+                                            .foregroundColor(viewModel.tasks[index].isCompleted ? .green : .gray)
+                                    }
+                                    .buttonStyle(.plain)
+
+                                    NavigationLink(destination: TodoItemDetailView(todoItem: viewModel.tasks[index])) {
+                                        Text(viewModel.tasks[index].title)
+                                            .strikethrough(viewModel.tasks[index].isCompleted)
+                                    }
+                                }
+                            }
+                            .onDelete { viewModel.deleteItems(at: $0) }
+                        }
+                    }
+                }
+                .animation(.easeInOut(duration: 0.25), value: viewModel.tasks.count)
+
+                Button(action: { Task { await viewModel.loadRemoteTasks() } }) {
+                    Label("Sync Core Database", systemImage: "arrow.clockwise")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding()
+            }
+            .navigationTitle("Dashboard")
+        }
+    }
+}
+
+struct TodoItemDetailView: View {
+    let todoItem: TodoItem
+    var body: some View {
+        VStack(spacing: 20) {
+            Image(systemName: todoItem.isCompleted ? "doc.plaintext.fill" : "doc.plaintext")
+                .font(.system(size: 60))
+                .foregroundColor(todoItem.isCompleted ? .green : .orange)
+            Text(todoItem.title).font(.title).bold()
+            Spacer()
+        }
+        .padding(.top, 50)
+        .navigationTitle("Verification Tracker")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+#Preview {
+    ProfileView()
+}</code></pre>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <!-- ============ 23 RULES ============ -->
+    <section class="block" id="rules">
+      <div class="sec-head">
+        <div>
+          <span class="sec-index">23 — Checklist</span>
+          <h2>6 translation rules</h2>
+          <p class="desc">Keep these in your head while porting any Bloc/Cubit screen over.</p>
+        </div>
+      </div>
+
+      <ol class="rule-list" style="padding:0; margin:0;">
+        <li><span class="rn">01</span><div class="rt"><b>The ViewModel <em>is</em> your Cubit.</b><span>No separate State classes — properties on the <code>@Observable</code> class are the state; methods are your Cubit methods.</span></div></li>
+        <li><span class="rn">02</span><div class="rt"><b>SwiftUI is your BlocBuilder.</b><span>Reading <code>viewModel.tasks.count</code> inside a view body auto-creates a targeted observer — no wrapper widget needed.</span></div></li>
+        <li><span class="rn">03</span><div class="rt"><b>No manual disposes.</b><span>ARC drops the ViewModel from memory the instant a screen leaves the navigation stack.</span></div></li>
+        <li><span class="rn">04</span><div class="rt"><b>Use <code>Task {}</code> for async hooks.</b><span>Button closures are synchronous — wrap async calls explicitly, or use <code>.task {}</code> for auto-fire-on-appear.</span></div></li>
+        <li><span class="rn">05</span><div class="rt"><b>Declare navigation tree-side.</b><span>Instead of <code>Navigator.push()</code> in a callback, wrap the destination inline: <code>NavigationLink(destination:) { ... }</code>.</span></div></li>
+        <li><span class="rn">06</span><div class="rt"><b>Use indices to mutate list items.</b><span><code>ForEach</code> loops pass copies — iterate <code>.indices</code> when you need direct array write-back.</span></div></li>
+      </ol>
+    </section>
+
+    <footer>
+      <span>Flutter ⇄ SwiftUI — personal revision notes</span>
+      <span>AppGenie · SwiftUI exploration</span>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  // theme toggle — defaults to dark, remembers choice
+  (function(){
+    const saved = localStorage.getItem('fs-notes-theme');
+    if(saved === 'light'){ document.documentElement.setAttribute('data-theme','light'); }
+    const btn = document.getElementById('theme-toggle');
+    btn.addEventListener('click', function(){
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if(isLight){
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('fs-notes-theme','dark');
+      } else {
+        document.documentElement.setAttribute('data-theme','light');
+        localStorage.setItem('fs-notes-theme','light');
+      }
+    });
+  })();
+
+  hljs.highlightAll();
+
+  // copy-to-clipboard for every code block
+  (function(){
+    function copyText(text){
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+      // fallback for file:// or non-secure contexts
+      return new Promise((resolve) => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        resolve();
+      });
+    }
+
+    function makeButton(getText, floating){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'copy-btn' + (floating ? ' copy-btn-floating' : '');
+      btn.setAttribute('aria-label', 'Copy code');
+      btn.innerHTML = '<span class="copy-icon">⧉</span><span class="copy-label">Copy</span>';
+      btn.addEventListener('click', () => {
+        copyText(getText()).then(() => {
+          btn.classList.add('copied');
+          btn.querySelector('.copy-label').textContent = 'Copied';
+          clearTimeout(btn._resetTimer);
+          btn._resetTimer = setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.querySelector('.copy-label').textContent = 'Copy';
+          }, 1600);
+        });
+      });
+      return btn;
+    }
+
+    // 1) mac-style code blocks — button lives in the header, right-aligned
+    document.querySelectorAll('.code-wrap').forEach((wrap) => {
+      const head = wrap.querySelector('.code-head');
+      const codeEl = wrap.querySelector('pre code') || wrap.querySelector('pre');
+      if (!head || !codeEl) return;
+      head.appendChild(makeButton(() => codeEl.textContent, false));
+    });
+
+    // 2) plain <pre> blocks with no header (translator-card side-by-side snippets) —
+    // floating button, visible on hover/tap
+    document.querySelectorAll('pre').forEach((pre) => {
+      if (pre.closest('.code-wrap')) return; // already handled above
+      if (pre.dataset.copyAttached) return;
+      pre.dataset.copyAttached = 'true';
+      pre.parentElement.classList.add('has-copy');
+      pre.parentElement.appendChild(makeButton(() => pre.textContent, true));
+    });
+  })();
+
+
+  // active-link highlighting on scroll
+  const links = document.querySelectorAll('nav.toc-list a');
+  const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+
+  // on mobile the TOC is collapsed into a dropdown — close it after a tap
+  // so the jump target is actually visible, and let the browser complete
+  // the anchor scroll before we touch anything else.
+  links.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const list = document.querySelector('nav.toc-list');
+      const target = document.querySelector(link.getAttribute('href'));
+      if (list.classList.contains('open') && target) {
+        // collapsing the dropdown changes page height, which throws off
+        // a scroll that started before the collapse — so do it manually,
+        // in the right order, instead of letting the browser jump first.
+        e.preventDefault();
+        list.classList.remove('open');
+        requestAnimationFrame(() => {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    });
+  });
+
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s,i) => { if(s && s.offsetTop <= y) idx = i; });
+    links.forEach((l,i) => l.classList.toggle('active', i === idx));
+  }
+  document.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+</script>
+
+</body>
+</html>
