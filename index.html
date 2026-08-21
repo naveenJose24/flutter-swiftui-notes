@@ -635,6 +635,118 @@
 
   ::-webkit-scrollbar{height:8px;}
 
+  /* ---------- Flip cards (Explain) ---------- */
+  .code-wrap.flip-card{ perspective:1600px; }
+  .flip-inner{
+    position:relative;
+    width:100%;
+    transition:transform .6s cubic-bezier(.4,.2,.2,1);
+    transform-style:preserve-3d;
+  }
+  .code-wrap.flip-card.is-flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    width:100%;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+  }
+  .flip-face.flip-front{ position:relative; }
+  .flip-face.flip-back{
+    position:absolute;
+    inset:0;
+    top:0; left:0;
+    transform:rotateY(180deg);
+    overflow-y:auto;
+    background:var(--surface);
+    border-radius:var(--radius);
+    display:flex;
+    flex-direction:column;
+  }
+
+  .explain-btn{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding:5px 10px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--bg-elevated);
+    color:var(--text-muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .code-wrap.swift .explain-btn:hover{ color:var(--swift); border-color:var(--swift-line); background:var(--swift-soft); }
+  .code-wrap.dart .explain-btn:hover{ color:var(--flutter); border-color:var(--flutter-line); background:var(--flutter-soft); }
+  .explain-btn .explain-icon{ font-size:12px; line-height:1; }
+
+  .explain-back-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:11px 16px;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--border);
+    font-size:12px;
+    color:var(--text-muted);
+    flex-shrink:0;
+  }
+  .explain-back-head .explain-back-title{
+    font-family:'IBM Plex Mono', monospace;
+    opacity:.9;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .explain-back-head .explain-back-title::before{
+    content:"◆";
+    color:var(--mint);
+    font-size:11px;
+  }
+  .back-to-code-btn{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-shrink:0;
+    padding:5px 10px;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--bg-elevated);
+    color:var(--text-muted);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .back-to-code-btn:hover{ background:var(--surface); color:var(--text); }
+
+  .explain-body{
+    padding:16px 18px;
+    font-size:.92rem;
+    line-height:1.6;
+    color:var(--text);
+    overflow-y:auto;
+  }
+  .explain-body p{ margin:0 0 10px 0; }
+  .explain-body p:last-child{ margin-bottom:0; }
+  .explain-body ul{ margin:0 0 10px 0; padding-left:18px; display:flex; flex-direction:column; gap:6px; }
+  .explain-body ul:last-child{ margin-bottom:0; }
+  .explain-body strong{ color:var(--text); font-weight:600; }
+  .explain-body code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.87em;
+    background:var(--bg-elevated);
+    padding:1px 6px;
+    border-radius:5px;
+    border:1px solid var(--border);
+    color:var(--swift);
+  }
+  html[data-theme="light"] .explain-body code{ background:#141a21; color:#ff8a52; }
+
 </style>
 </head>
 <body>
@@ -840,9 +952,7 @@ flutter run -d "iPhone 15"</pre>
         </table>
       </div>
 
-      <div class="code-wrap swift">
-        <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — the @main entry point</span></div>
-        <pre><code class="language-swift">import SwiftUI
+      <div class="code-wrap swift flip-card" id="flip-1"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — the @main entry point</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-1')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">import SwiftUI
 
 @main
 struct YourAppNameApp: App {
@@ -851,8 +961,8 @@ struct YourAppNameApp: App {
             ProfileView()   // like runApp(MyApp()) in main.dart
         }
     }
-}</code></pre>
-      </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-1')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>@main</code> marks this struct as the program's entry point — the direct equivalent of Dart's <code>void main() =&gt; runApp(MyApp())</code>. Conforming to <code>App</code> requires a <code>body</code> of type <code>some Scene</code> (not <code>some View</code> — a <code>Scene</code> describes a window, not a widget).</p>
+<p><code>WindowGroup</code> is the scene that hosts your window/UI hierarchy, roughly playing the role of <code>MaterialApp</code>/<code>CupertinoApp</code> at the root. <code>ProfileView()</code> inside it is your root screen, exactly like the <code>home:</code> widget you'd hand to <code>MaterialApp</code>.</p></div></div></div></div>
 
       <div class="callout">
         <span class="ico">◆</span>
@@ -983,9 +1093,7 @@ no manifest to hand-edit.</pre>
       <details class="collapse">
         <summary><span>@State — owns a primitive, redraws on setState-style mutation</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>ContentView.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">struct ContentView: View {
+          <div class="code-wrap swift flip-card" id="flip-2"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ContentView.swift</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-2')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct ContentView: View {
     // Always mark it 'private' — it's screen-owned
     @State private var count = 0
     @State private var isPremiumUser = false
@@ -1010,17 +1118,15 @@ no manifest to hand-edit.</pre>
         }
         .padding()
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-2')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>@State private var count = 0</code> allocates a private, view-owned mutable cell — this is the direct analog of a field inside a <code>StatefulWidget</code>'s <code>State</code> class. The <code>private</code> keyword isn't cosmetic: SwiftUI expects <code>@State</code> to be exclusively owned by the view that declares it, same as you'd never read another widget's private State fields.</p>
+<p>The key difference from Flutter is in the button closures: <code>count += 1</code> and <code>isPremiumUser.toggle()</code> mutate the value <strong>directly</strong> — there's no <code>setState(() { ... })</code> wrapper. SwiftUI's property-wrapper machinery detects the write to a <code>@State</code> var automatically and schedules a re-render of exactly the parts of <code>body</code> that read it, so you get fine-grained rebuilds without ever calling something equivalent to <code>notifyListeners()</code>.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>@Binding — a child mutates a value it doesn't own</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>ParentView.swift + LightSwitchComponent.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">// PARENT — owns the source of truth
+          <div class="code-wrap swift flip-card" id="flip-3"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ParentView.swift + LightSwitchComponent.swift</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-3')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">// PARENT — owns the source of truth
 struct ParentView: View {
     @State private var isLightOn = false
 
@@ -1045,8 +1151,8 @@ struct LightSwitchComponent: View {
             isOn.toggle()   // this updates the PARENT's circle color
         }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-3')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the classic "controlled child" pattern. <code>ParentView</code> owns the real value with <code>@State private var isLightOn = false</code> — same as any <code>StatefulWidget</code> holding a boolean. When it hands that value to the child, it doesn't pass <code>isLightOn</code> directly; it passes <code>$isLightOn</code>. The <code>$</code> prefix on any <code>@State</code> property produces a <code>Binding&lt;Bool&gt;</code> — a live, two-way reference, not a copy.</p>
+<p><code>LightSwitchComponent</code> declares <code>@Binding var isOn: Bool</code>, meaning "I don't own this value, but I can read <em>and write</em> it." When the child does <code>isOn.toggle()</code>, that mutation is written straight back into the parent's <code>isLightOn</code>, and the parent's <code>Circle</code> re-renders. In Flutter terms this is exactly passing a value down alongside an <code>onChanged: (val) { setState(() => isLightOn = val); }</code> callback — except <code>@Binding</code> collapses "the value" and "the callback that writes it" into a single object.</p></div></div></div></div>
           <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> passing a value down alongside an <code>onChanged: (val) {}</code> callback into a custom widget's constructor.</p>
         </div>
       </details>
@@ -1054,9 +1160,7 @@ struct LightSwitchComponent: View {
       <details class="collapse">
         <summary><span>@Observable + @MainActor — the Cubit, thread-safe by default</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>TodoViewModel.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">// @MainActor forces every mutation back onto the UI thread,
+          <div class="code-wrap swift flip-card" id="flip-4"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>TodoViewModel.swift</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-4')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">// @MainActor forces every mutation back onto the UI thread,
 // even after an 'await' hops onto a background worker thread.
 @MainActor
 @Observable class TodoViewModel {
@@ -1069,8 +1173,8 @@ struct LightSwitchComponent: View {
         // no manual emit() or notifyListeners() needed.
         self.tasks = fetchedData
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-4')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>The comment at the top says it all: <code>@MainActor</code> is Swift's compiler-enforced guarantee that every property mutation on this class happens back on the UI thread, even after an <code>await</code> has hopped onto a background worker. Dart doesn't need this — its single-threaded event loop makes this a non-issue — but Swift's structured concurrency genuinely can run <code>await</code> continuations off the main thread, so ViewModels that touch UI state are annotated <code>@MainActor</code> as standard practice.</p>
+<p><code>@Observable class TodoViewModel</code> is your Cubit: <code>var tasks: [TodoItem]</code> is the state, and <code>loadRemoteTasks()</code> is a Cubit method. Notice there's no <code>emit()</code> call and no separate <code>TodoState</code> class — the macro instruments every stored property so that any SwiftUI view reading <code>viewModel.tasks</code> automatically subscribes to just that property, and <code>self.tasks = fetchedData</code> is the entire "emit new state" step.</p></div></div></div></div>
           <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> Dart's single-threaded event loop hides this problem entirely — <code>@MainActor</code> is Swift's explicit guardrail against threading crashes.</p>
         </div>
       </details>
@@ -1079,9 +1183,7 @@ struct LightSwitchComponent: View {
         <summary><span>@Bindable — pattern 1: parent creates, child mutates</span><span class="chev">▸</span></summary>
         <div class="inner">
           <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 4px 0;"><code>@State</code> on the parent <em>creates and owns</em> the instance. <code>@Bindable</code> on the child <em>accepts</em> that same instance so it can generate two-way <code>$</code> bindings back to it.</p>
-          <div class="code-wrap swift">
-            <div class="code-head"><span>ParentDashboardView.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">struct ParentDashboardView: View {
+          <div class="code-wrap swift flip-card" id="flip-5"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ParentDashboardView.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-5')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct ParentDashboardView: View {
     // 1. @State CREATES the object here — this view owns it
     @State private var globalCubit = ProfileViewModel()
 
@@ -1106,8 +1208,8 @@ struct SettingsScreen: View {
         //    PARENT view's memory — true two-way binding
         TextField("Change username", text: $viewModel.username)
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-5')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the standard "who creates it, who edits it" split. <code>ParentDashboardView</code> declares <code>@State private var globalCubit = ProfileViewModel()</code> — the <code>@State</code> wrapper here is doing the same job as <code>BlocProvider(create: (_) => ProfileCubit())</code>: it constructs the instance <strong>and owns its lifetime</strong>, keeping it alive across re-renders of this view.</p>
+<p>That instance is then passed down as a plain constructor argument: <code>SettingsScreen(viewModel: globalCubit)</code>. Inside the child, <code>@Bindable var viewModel: ProfileViewModel</code> unlocks the ability to write <code>$viewModel.username</code> — a live two-way binding straight into the parent-owned object's property, which is what lets <code>TextField("Change username", text: $viewModel.username)</code> mutate the shared instance directly. The Flutter equivalent is handing an existing Cubit reference into a child widget's constructor so a controller/field inside it can call methods on that same Cubit instance.</p></div></div></div></div>
           <p style="color:var(--text-muted); font-size:13.5px; margin:0;"><b style="color:var(--flutter);">Flutter equivalent:</b> passing an existing Cubit instance down into a child widget's constructor so a text controller can mutate its fields directly.</p>
         </div>
       </details>
@@ -1116,9 +1218,7 @@ struct SettingsScreen: View {
         <summary><span>@Bindable — pattern 2: binding straight into a Form</span><span class="chev">▸</span></summary>
         <div class="inner">
           <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 4px 0;">The most common shape in practice — a settings screen with several fields, all bound to one <code>@Observable</code> model.</p>
-          <div class="code-wrap swift">
-            <div class="code-head"><span>ProfileViewModel.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">@Observable class ProfileViewModel {
+          <div class="code-wrap swift flip-card" id="flip-6"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ProfileViewModel.swift + SettingsScreen.swift</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-6')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">@Observable class ProfileViewModel {
     var username: String = "John"
     var notificationsEnabled: Bool = true
 }
@@ -1136,8 +1236,8 @@ struct SettingsScreen: View {
             Toggle("Alerts", isOn: $viewModel.notificationsEnabled)
         }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-6')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>Same <code>@Bindable</code> mechanism as the previous card, but this is the shape you'll actually reach for most often: a settings-style screen with several fields bound straight to one <code>@Observable</code> model, no intermediate local <code>@State</code> copies to keep in sync.</p>
+<p><code>ProfileViewModel</code> is a plain reactive class (your Cubit) with two properties. <code>SettingsScreen</code> receives it as <code>@Bindable var viewModel</code>, which is what makes <code>$viewModel.username</code> and <code>$viewModel.notificationsEnabled</code> legal inside the <code>Form</code>. Without <code>@Bindable</code>, the compiler rejects the <code>$</code> prefix entirely — this is a compile-time guardrail, not a runtime warning, so a missing <code>@Bindable</code> shows up immediately rather than as a silent "my toggle doesn't update the model" bug the way a missed <code>notifyListeners()</code> call might in Flutter.</p></div></div></div></div>
           <div class="callout" style="margin:12px 0 0 0;">
             <span class="ico">◆</span>
             <div><b>Compiler rule</b> — a class passed into a subview is read-only for UI purposes by default. The moment a <code>TextField</code> or <code>Toggle</code> inside that subview needs to <em>write back</em> to it, the property must be marked <code>@Bindable</code>, or the build fails.</div>
@@ -1180,20 +1280,16 @@ struct SettingsScreen: View {
       <details class="collapse">
         <summary><span>Push with data — inline destination vs typed routes</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Inline destination — fine for a handful of screens</span></div>
-            <pre><code class="language-swift">NavigationStack {
+          <div class="code-wrap swift flip-card" id="flip-7"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Inline destination — fine for a handful of screens</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-7')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">NavigationStack {
     List(products) { product in
         NavigationLink(destination: ProductDetailView(product: product)) {
             Text(product.name)
         }
     }
     .navigationTitle("Catalog")
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Typed routes — scales like GoRouter's route table</span></div>
-            <pre><code class="language-swift">NavigationStack {
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-7')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the simplest navigation shape: <code>NavigationLink(destination: ProductDetailView(product: product))</code> builds the destination screen <strong>eagerly, inline</strong>, right where the link is declared — the direct equivalent of <code>Navigator.push(context, MaterialPageRoute(builder: (_) => ProductDetailView(product: product)))</code> called from inside a list item's <code>onTap</code>.</p>
+<p><code>NavigationStack { ... }</code> wraps the whole screen and gives it a navigation context, similar to how <code>MaterialApp</code>/<code>Navigator</code> gives every screen access to push/pop. This style is fine for a handful of destinations, but because the destination view is constructed immediately for every row (not lazily), it doesn't scale the same way as the typed-routes pattern shown in the next card once a list gets pushed to hundreds of items.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-8"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Typed routes — scales like GoRouter's route table</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-8')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">NavigationStack {
     List(products) { product in
         // pass the VALUE, not a built view
         NavigationLink(product.name, value: product)
@@ -1203,17 +1299,15 @@ struct SettingsScreen: View {
         ProductDetailView(product: product)
     }
     .navigationTitle("Catalog")
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-8')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the scalable alternative to inline destinations. Instead of building a view per row, <code>NavigationLink(product.name, value: product)</code> pushes a plain <strong>value</strong> (the <code>Product</code> struct itself) onto the navigation stack — nothing is built yet.</p>
+<p>Resolution happens once, centrally, via <code>.navigationDestination(for: Product.self) { product in ProductDetailView(product: product) }</code> — a single closure that knows how to turn <em>any</em> <code>Product</code> pushed anywhere in this stack into a screen. Stack multiple <code>.navigationDestination(for:)</code> modifiers for different types on one <code>NavigationStack</code> and you get something close to GoRouter's centralized <code>routes: [...]</code> table — one registration point per "route type" instead of one <code>MaterialPageRoute</code> built at every call site.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>Programmatic navigation — pop, pop-to-root, push from code</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NavigationPath — like holding your own route stack</span></div>
-            <pre><code class="language-swift">struct RootView: View {
+          <div class="code-wrap swift flip-card" id="flip-9"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NavigationPath — like holding your own route stack</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-9')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct RootView: View {
     // owns the whole back-stack, like a GlobalKey&lt;NavigatorState&gt;
     @State private var path = NavigationPath()
 
@@ -1233,17 +1327,15 @@ Button("Go to checkout") { path.append(CartStep.shipping) }
 
 // popping one screen from within a pushed view
 @Environment(\.dismiss) private var dismiss
-Button("Back") { dismiss() }</code></pre>
-          </div>
+Button("Back") { dismiss() }</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-9')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>NavigationPath</code> is what you reach for when you need to manipulate the back-stack from outside the view that's currently on top — the same job a <code>GlobalKey&lt;NavigatorState&gt;</code> does in Flutter so you can call <code>Navigator.of(key.currentContext!).push(...)</code> from anywhere.</p>
+<p><code>@State private var path = NavigationPath()</code> on the root view owns the entire stack, and it's bound into <code>NavigationStack(path: $path)</code>. From anywhere holding a <code>Binding&lt;NavigationPath&gt;</code>, <code>path.append(CartStep.shipping)</code> pushes a new screen programmatically (no <code>NavigationLink</code> tap required) — like calling <code>navigatorKey.currentState!.push(route)</code>. Resetting it with <code>path = NavigationPath()</code> pops everything back to root in one line, equivalent to <code>Navigator.popUntil((route) =&gt; route.isFirst)</code>. Popping just one screen from inside a pushed view uses <code>@Environment(\.dismiss)</code> then <code>dismiss()</code> — SwiftUI's version of <code>Navigator.pop(context)</code>.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>Modals — sheet vs full-screen cover</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Sheet — like showModalBottomSheet</span></div>
-            <pre><code class="language-swift">struct HomeView: View {
+          <div class="code-wrap swift flip-card" id="flip-10"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Sheet — like showModalBottomSheet</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-10')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct HomeView: View {
     @State private var showingFilters = false
 
     var body: some View {
@@ -1253,8 +1345,8 @@ Button("Back") { dismiss() }</code></pre>
                     .presentationDetents([.medium, .large])  // like a draggable bottom sheet
             }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-10')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>.sheet(isPresented: $showingFilters) { ... }</code> is driven purely by a boolean <code>@State</code> flag — set it <code>true</code> and SwiftUI animates the sheet in; when the user dismisses it (or you flip the flag back), it animates out and resets automatically. This is directly analogous to Flutter's <code>showModalBottomSheet()</code>, except here presentation is declarative and tied to state rather than an imperative call that returns a <code>Future</code>.</p>
+<p><code>.presentationDetents([.medium, .large])</code> is the part with no one-line Flutter equivalent — it makes the sheet draggable between a half-height and full-height snap point, similar to hand-rolling a <code>DraggableScrollableSheet</code> with fixed size fractions, but built into the modal itself with zero extra widget nesting.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1321,19 +1413,15 @@ return try JSONDecoder().decode(User.self, from: data)</pre>
       <details class="collapse">
         <summary><span>Full example — Codable model + a NetworkService your ViewModel calls</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>User.swift — the model</span></div>
-            <pre><code class="language-swift">// Codable = Decodable + Encodable, synthesized automatically
+          <div class="code-wrap swift flip-card" id="flip-11"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>User.swift — the model</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-11')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">// Codable = Decodable + Encodable, synthesized automatically
 // as long as every property type is itself Codable.
 struct User: Codable, Identifiable {
     let id: Int
     let name: String
     let email: String
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NetworkService.swift — a plain async function, no DI framework required</span></div>
-            <pre><code class="language-swift">enum NetworkError: Error { case badResponse, decodingFailed }
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-11')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>struct User: Codable, Identifiable</code> — conforming to <code>Codable</code> (which is really <code>Decodable</code> + <code>Encodable</code> combined) is all it takes to get JSON parsing for free, <strong>as long as every stored property is itself a <code>Codable</code> type</strong> (here: two <code>String</code>s and an <code>Int</code>, all of which qualify automatically). The compiler synthesizes the parsing/serialization code at build time.</p>
+<p>This replaces two separate things you'd normally reach for in Flutter: hand-writing <code>User.fromJson(Map)</code> / <code>toJson()</code> methods yourself, <em>or</em> running <code>json_serializable</code> + <code>build_runner</code> to generate a <code>user.g.dart</code> file. Here there's no generated file and no build step — <code>Identifiable</code> additionally gives the struct the <code>id</code> requirement that <code>List</code>/<code>ForEach</code> need to diff rows efficiently, similar to supplying a <code>key:</code> in a Flutter <code>ListView.builder</code>.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-12"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NetworkService.swift — a plain async function, no DI framework required</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-12')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">enum NetworkError: Error { case badResponse, decodingFailed }
 
 struct NetworkService {
     static func fetchUser(id: Int) async throws -> User {
@@ -1351,11 +1439,9 @@ struct NetworkService {
             throw NetworkError.decodingFailed
         }
     }
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — calling it from your Cubit-equivalent</span></div>
-            <pre><code class="language-swift">@MainActor
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-12')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>enum NetworkError: Error</code> is a lightweight custom error type — think of it like a small sealed class of failure reasons you'd throw from a Dart repository method. <code>NetworkService</code> is a plain <code>struct</code> with one <code>static</code> async function; there's no DI container or service locator involved, it's called directly as <code>NetworkService.fetchUser(id:)</code>, similar to a static utility method or a top-level function in Dart.</p>
+<p><code>try await URLSession.shared.data(from: url)</code> is the built-in HTTP client — no <code>http</code> or <code>dio</code> package needed, and it's the direct equivalent of <code>await http.get(uri)</code>. The <code>guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else { throw ... }</code> block is a range-check on the status code (matching <code>if (res.statusCode == 200)</code>, but tolerating the whole 2xx family) that throws instead of falling into an <code>else</code> branch. <code>JSONDecoder().decode(User.self, from: data)</code> is the <code>jsonDecode()</code> + <code>User.fromJson()</code> combo collapsed into one call, thanks to <code>Codable</code>.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-13"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — calling it from your Cubit-equivalent</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-13')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">@MainActor
 @Observable class UserViewModel {
     var user: User?
     var loadingState: FetchState = .idle
@@ -1369,8 +1455,8 @@ struct NetworkService {
             loadingState = .error(message: "Couldn't load user profile.")
         }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-13')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This ViewModel is exactly your Cubit calling a repository method. <code>var user: User?</code> and <code>var loadingState: FetchState</code> together <strong>are</strong> the state — there's no separate immutable state class to construct and <code>emit()</code>; you assign these properties directly and <code>@Observable</code> notifies any view reading them.</p>
+<p><code>loadingState = .loading</code> then a <code>do/catch</code> around the network call mirrors emitting a loading state before an async call and a success/failure state after — the same three-phase dance you'd write with a Cubit's <code>emit(state.copyWith(status: Loading))</code> pattern, just without the <code>copyWith</code> boilerplate since these are plain mutable <code>var</code>s on a reference-typed class.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1428,9 +1514,7 @@ let seen = UserDefaults.standard.bool(forKey: "onboarded")
       <details class="collapse">
         <summary><span>SwiftData — a persisted, queryable model (Hive/Isar equivalent)</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Note.swift — the persisted model</span></div>
-            <pre><code class="language-swift">import SwiftData
+          <div class="code-wrap swift flip-card" id="flip-14"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Note.swift — the persisted model</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-14')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">import SwiftData
 
 @Model
 class Note {
@@ -1443,11 +1527,9 @@ class Note {
         self.body = body
         self.createdAt = .now
     }
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NotesListView.swift — @Query auto-refreshes on any change</span></div>
-            <pre><code class="language-swift">struct NotesListView: View {
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-14')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>import SwiftData</code> plus the <code>@Model</code> macro on an otherwise ordinary <code>class</code> is what turns <code>Note</code> into a persisted, queryable database entity — this is the direct sibling of annotating a class for Hive (<code>@HiveType</code>) or Isar (<code>@collection</code>). No manual adapter registration or generated <code>.g.dart</code> file is required; the macro does the work at compile time.</p>
+<p>The <code>init</code> is a completely normal Swift initializer — nothing SwiftData-specific about it. SwiftData is the framework recommended for iOS 17+ targets; on older deployment targets you'd reach for <code>Core Data</code> instead, which needs considerably more setup (an <code>.xcdatamodeld</code> file, generated <code>NSManagedObject</code> subclasses).</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-15"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>NotesListView.swift — @Query auto-refreshes on any change</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-15')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct NotesListView: View {
     // Like a Hive box listener, but the view redraws itself —
     // no manual ValueListenableBuilder wiring
     @Query(sort: \Note.createdAt, order: .reverse) private var notes: [Note]
@@ -1461,8 +1543,8 @@ class Note {
                 }
             }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-15')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>@Query(sort: \Note.createdAt, order: .reverse) private var notes: [Note]</code> is the standout line here: it's a property wrapper that both fetches <em>and subscribes to</em> the persisted store. Any insert, update, or delete to <code>Note</code> anywhere in the app causes this array — and therefore this view — to refresh automatically.</p>
+<p>Think of it as a Hive box change-listener that's already wired up for you: normally you'd pair a box listener with a <code>ValueListenableBuilder</code> to get the UI to redraw on changes; <code>@Query</code> collapses both steps into one declaration. <code>@Environment(\.modelContext) private var context</code> is the handle used to write — <code>context.insert(Note(...))</code> is the "add a record" call, comparable to <code>box.add(note)</code>, and because the view is already subscribed via <code>@Query</code>, the list updates without any extra code on the write side.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1502,9 +1584,7 @@ class Note {
       <details class="collapse">
         <summary><span>Implicit vs explicit — the two animation styles</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Implicit — like wrapping in AnimatedContainer</span></div>
-            <pre><code class="language-swift">struct BadgeView: View {
+          <div class="code-wrap swift flip-card" id="flip-16"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Implicit — like wrapping in AnimatedContainer</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-16')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct BadgeView: View {
     @State private var isActive = false
 
     var body: some View {
@@ -1515,27 +1595,23 @@ class Note {
             .animation(.easeInOut(duration: 0.3), value: isActive)
             .onTapGesture { isActive.toggle() }
     }
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Explicit — like manually driving an AnimationController</span></div>
-            <pre><code class="language-swift">Button("Add to cart") {
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-16')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is SwiftUI's <strong>implicit</strong> animation style — you don't choose an animation widget, you animate a value change. <code>.frame(width: isActive ? 60 : 40, ...)</code> computes a different value depending on state, and the single line <code>.animation(.easeInOut(duration: 0.3), value: isActive)</code> tells SwiftUI: "whenever <code>isActive</code> changes, animate every property upstream of this modifier that depends on it" — here, both the fill color and the frame size animate together automatically.</p>
+<p>The nearest Flutter equivalent is wrapping the same subtree in an <code>AnimatedContainer</code> and letting it interpolate size/color changes for you — except in SwiftUI this works with <em>any</em> value-driven modifier (color, size, offset, corner radius, opacity...), not just the specific properties one particular animated widget exposes.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-17"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Explicit — like manually driving an AnimationController</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-17')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">Button("Add to cart") {
     // only the mutation inside this closure animates —
     // nothing else on screen is affected
     withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
         cart.items.append(product)
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-17')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the <strong>explicit</strong> counterpart to the implicit example above — used when you want to animate one specific state mutation without touching a persistent modifier on the view. <code>withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) { cart.items.append(product) }</code> wraps just the mutation; only the UI changes that result from <code>cart.items.append(product)</code> get animated, nothing else on screen is affected.</p>
+<p>The Flutter analog is manually driving an <code>AnimationController</code> (<code>.forward()</code>) tied to a <code>Tween</code> — except here there's no controller object to create, dispose, or wire to a <code>TickerProvider</code>; <code>withAnimation</code> is a scoped, one-shot block, and the <code>.spring(response:dampingFraction:)</code> curve gives you physics-based motion (bounce and settle time) without hand-configuring a <code>SpringSimulation</code>.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>Gestures — tap, long-press, and drag</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Composable gesture recognizers</span></div>
-            <pre><code class="language-swift">struct DraggableCard: View {
+          <div class="code-wrap swift flip-card" id="flip-18"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Composable gesture recognizers</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-18')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct DraggableCard: View {
     @State private var offset = CGSize.zero
 
     var body: some View {
@@ -1551,8 +1627,8 @@ class Note {
             .onTapGesture { print("tapped") }
             .onLongPressGesture { print("long pressed") }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-18')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>DragGesture()</code> is a composable gesture recognizer, attached via <code>.gesture(...)</code> — this maps to <code>GestureDetector(onPanUpdate:, onPanEnd:)</code> in Flutter. <code>.onChanged { value in offset = value.translation }</code> fires continuously as the finger moves and writes straight into <code>@State private var offset: CGSize</code>, which is read back by <code>.offset(offset)</code> on the same view — a live feedback loop, similar to updating an offset inside <code>setState()</code> on every pan-update callback.</p>
+<p><code>.onEnded { _ in withAnimation(.spring) { offset = .zero } }</code> snaps the card back to its origin with spring physics once the drag ends — the explicit-animation pattern from the card above, applied here to a single reset. <code>.onTapGesture</code> and <code>.onLongPressGesture</code> chain onto the same view for the equivalent of <code>onTap</code>/<code>onLongPress</code> — SwiftUI lets you stack multiple gesture recognizers on one view without an explicit <code>GestureDetector</code> wrapper widget.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1590,9 +1666,7 @@ class Note {
       <details class="collapse">
         <summary><span>A login form — focus chaining + inline validation</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>LoginView.swift</span></div>
-            <pre><code class="language-swift">struct LoginView: View {
+          <div class="code-wrap swift flip-card" id="flip-19"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>LoginView.swift</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-19')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var errorMessage: String?
@@ -1636,8 +1710,8 @@ class Note {
         errorMessage = nil
         // proceed with sign-in
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-19')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>Form { Section { ... } }</code> is a built-in, pre-styled grouped list container — no separate package, unlike reaching for a custom <code>ListView</code> layout to mimic native settings-screen styling in Flutter. <code>enum Field { case email, password }</code> paired with <code>@FocusState private var focusedField: Field?</code> tracks which field currently has keyboard focus, the direct equivalent of a <code>FocusNode</code> per field plus a <code>FocusScope</code> to coordinate them.</p>
+<p><code>.focused($focusedField, equals: .email)</code> binds a specific field to that focus state, and <code>.onSubmit { focusedField = .password }</code> chains focus forward on the return key — like calling <code>FocusScope.of(context).requestFocus(passwordNode)</code> from a field's <code>onFieldSubmitted</code>. Crucially there's <strong>no <code>validator:</code> callback</strong> on <code>TextField</code>: validation is manual, done here inside <code>submit()</code> with plain <code>guard</code> statements that set <code>errorMessage</code> — the same logic a <code>TextFormField(validator:)</code> would run per-field automatically, just written by hand and checked at submit time instead.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1677,9 +1751,7 @@ class Note {
       <details class="collapse">
         <summary><span>Reacting to dark mode without hardcoding colors</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Reading the environment's color scheme</span></div>
-            <pre><code class="language-swift">struct CardView: View {
+          <div class="code-wrap swift flip-card" id="flip-20"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>Reading the environment's color scheme</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-20')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct CardView: View {
     @Environment(\.colorScheme) private var scheme
 
     var body: some View {
@@ -1692,17 +1764,15 @@ class Note {
             .foregroundStyle(scheme == .dark ? .white : .black)
             .cornerRadius(14)
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-20')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>@Environment(\.colorScheme) private var scheme</code> reads the current system appearance — this is the property-wrapper equivalent of calling <code>MediaQuery.platformBrightnessOf(context)</code>, but resolved automatically and kept live without you subscribing to anything.</p>
+<p>The more important line, though, is <code>.background(Color("BrandSurface"))</code>: that color is defined <em>once</em> in the Asset Catalog with separate "Any Appearance" and "Dark" values, so this single call already adapts to dark mode with zero branching — closer to referencing <code>Theme.of(context).colorScheme.surface</code> than to hardcoding a color. <code>scheme == .dark ? .white : .black</code> shows the escape hatch for the rarer case where you genuinely need to branch on the mode explicitly rather than letting an asset-catalog color do it for you.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>Reusable style — the ViewModifier pattern</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>A shared "card" look, applied like a BuildContext extension</span></div>
-            <pre><code class="language-swift">struct CardStyle: ViewModifier {
+          <div class="code-wrap swift flip-card" id="flip-21"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>A shared "card" look, applied like a BuildContext extension</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-21')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct CardStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(16)
@@ -1717,8 +1787,8 @@ extension View {
 }
 
 // usage anywhere:
-Text("Total balance").cardStyle()</code></pre>
-          </div>
+Text("Total balance").cardStyle()</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-21')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>ViewModifier</code> is SwiftUI's mechanism for packaging a chain of modifiers (padding, background, clip shape, shadow) into one reusable, named unit — <code>CardStyle</code> here bundles exactly that "card" look. The <code>extension View { func cardStyle() -> some View { modifier(CardStyle()) } }</code> block is what makes <code>Text("Total balance").cardStyle()</code> read like a first-class modifier at the call site.</p>
+<p>The closest Flutter idiom is an extension method on <code>BuildContext</code> or a small reusable wrapper widget that applies a consistent decoration — except here it composes directly into the modifier chain (<code>.padding().background().cardStyle()</code>) rather than nesting one more widget around your content. Reach for a <code>ViewModifier</code> any time you catch yourself repeating the same 3–4 modifiers across several views.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1832,9 +1902,7 @@ let msg = String(localized: "greeting \(userName)")</pre>
       <details class="collapse">
         <summary><span>Merging a custom row into one VoiceOver stop</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>OrderRow.swift</span></div>
-            <pre><code class="language-swift">struct OrderRow: View {
+          <div class="code-wrap swift flip-card" id="flip-22"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>OrderRow.swift</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-22')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct OrderRow: View {
     let order: Order
 
     var body: some View {
@@ -1849,8 +1917,8 @@ let msg = String(localized: "greeting \(userName)")</pre>
         .accessibilityLabel("\(order.title), \(order.status)")
         .accessibilityHint("Double tap to view order details")
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-22')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>Without any accessibility modifiers, VoiceOver would read this <code>HStack</code>'s two <code>Text</code> views as <strong>two separate stops</strong> when swiping through the screen — annoying for anyone navigating by screen reader. <code>.accessibilityElement(children: .combine)</code> merges the whole row into a single stop, the direct equivalent of Flutter's <code>MergeSemantics()</code> wrapping the same row.</p>
+<p><code>.accessibilityLabel(...)</code> and <code>.accessibilityHint(...)</code> then explicitly control what gets announced and what extra context follows — matching <code>Semantics(label: '...', hint: '...')</code> in Flutter. The hint in particular ("Double tap to view order details") tells VoiceOver users the row is interactive, since a merged custom row otherwise gives no indication it's tappable the way a native list cell would.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1888,9 +1956,7 @@ let msg = String(localized: "greeting \(userName)")</pre>
       <details class="collapse">
         <summary><span>Camera permission — the full request + check flow</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>CameraPermission.swift</span></div>
-            <pre><code class="language-swift">import AVFoundation
+          <div class="code-wrap swift flip-card" id="flip-23"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>CameraPermission.swift</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-23')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">import AVFoundation
 
 enum CameraPermission {
     static func request() async -> Bool {
@@ -1905,8 +1971,8 @@ enum CameraPermission {
             return false
         }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-23')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>enum CameraPermission { static func request() async -> Bool { ... } }</code> is a tiny namespaced utility — comparable to how you might wrap <code>permission_handler</code>'s <code>Permission.camera</code> calls in a small helper class of your own. There's no unified cross-permission package in SwiftUI/Swift; each system framework (here, <code>AVFoundation</code>) has its own request API.</p>
+<p>The <code>switch AVCaptureDevice.authorizationStatus(for: .video)</code> covers every possible state in one exhaustive statement — <code>.authorized</code> returns immediately, <code>.notDetermined</code> triggers the actual system prompt via <code>await AVCaptureDevice.requestAccess(for: .video)</code>, and <code>.denied</code>/<code>.restricted</code> both resolve to <code>false</code> without showing anything (iOS won't re-prompt once denied — that matches <code>permission_handler</code>'s behavior of only showing a dialog when status is genuinely undetermined). <code>@unknown default</code> future-proofs the switch against Apple adding a new case in a future SDK.</p></div></div></div></div>
         </div>
       </details>
 
@@ -1928,9 +1994,7 @@ enum CameraPermission {
       <details class="collapse" open>
         <summary><span>AppDelegate bridge — request permission, register, capture the token</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>PushNotificationManager.swift</span></div>
-            <pre><code class="language-swift">import UIKit
+          <div class="code-wrap swift flip-card" id="flip-24"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>PushNotificationManager.swift</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-24')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">import UIKit
 import UserNotifications
 
 @MainActor
@@ -1977,11 +2041,9 @@ final class PushNotificationManager: NSObject, UNUserNotificationCenterDelegate 
         // route to the relevant screen, e.g. push.append(...) on your NavigationPath
         print("Notification tapped with payload: \(userInfo)")
     }
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — wiring it in via AppDelegate adaptor</span></div>
-            <pre><code class="language-swift">import SwiftUI
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-24')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>final class PushNotificationManager: NSObject, UNUserNotificationCenterDelegate</code> is a delegate-conforming singleton (<code>static let shared</code>) — the shape you'd use in place of a package like <code>firebase_messaging</code>, since push here talks directly to Apple's frameworks. <code>@MainActor</code> on the whole class keeps every callback safely on the UI thread.</p>
+<p><code>requestAuthorization()</code> is the permission-request step (<code>FirebaseMessaging.instance.requestPermission()</code>'s equivalent), and once granted it calls <code>UIApplication.shared.registerForRemoteNotifications()</code> to actually register with APNs. <code>didReceiveDeviceToken(_:)</code> is where you'd send the token to your backend, same job as <code>FirebaseMessaging.instance.getToken()</code>. The two delegate methods at the bottom are the part with no free equivalent: <code>willPresent</code> decides how a notification looks <em>while the app is already open</em> (Flutter plugins usually pick sane defaults for you; here you list <code>[.banner, .sound, .badge]</code> explicitly), and <code>didReceive(response:)</code> fires when the user taps it — your hook for routing to the relevant screen, comparable to <code>FirebaseMessaging.onMessageOpenedApp</code>.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-25"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>YourAppNameApp.swift — wiring it in via AppDelegate adaptor</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-25')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">import SwiftUI
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
     func application(
@@ -2004,8 +2066,8 @@ struct YourAppNameApp: App {
                 .task { _ = await PushNotificationManager.shared.requestAuthorization() }
         }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-25')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>SwiftUI's <code>App</code> protocol has no built-in delegate method for "APNs handed you a device token" — that particular callback still only exists on the older UIKit <code>AppDelegate</code> API. <code>@UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate</code> is the sanctioned bridge: it lets a small UIKit-style <code>AppDelegate</code> class run alongside your SwiftUI app just for the handful of lifecycle callbacks SwiftUI doesn't expose yet.</p>
+<p>Think of this the same way you'd think about writing a small native platform-channel plugin in Flutter when a capability isn't wrapped by the framework layer — you drop one level down to the native API, then bridge the result back up. Here, <code>didRegisterForRemoteNotificationsWithDeviceToken</code> fires on the <code>AppDelegate</code> and forwards straight into <code>PushNotificationManager.shared.didReceiveDeviceToken(deviceToken)</code>, keeping the actual push logic in one place. <code>.task { ... requestAuthorization() }</code> on the root scene kicks the whole flow off on launch.</p></div></div></div></div>
         </div>
       </details>
 
@@ -2047,9 +2109,7 @@ struct YourAppNameApp: App {
       <details class="collapse">
         <summary><span>Pausing work when the app backgrounds</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>RootView.swift</span></div>
-            <pre><code class="language-swift">struct RootView: View {
+          <div class="code-wrap swift flip-card" id="flip-26"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>RootView.swift</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-26')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct RootView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel = SyncViewModel()
 
@@ -2069,8 +2129,8 @@ struct YourAppNameApp: App {
                 }
             }
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-26')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>@Environment(\.scenePhase) private var scenePhase</code> is a single environment value that replaces the observer-registration dance of <code>WidgetsBindingObserver</code> + overriding <code>didChangeAppLifecycleState</code> — no subscribe/unsubscribe pair to remember, and nothing to clean up in <code>dispose()</code>.</p>
+<p><code>.onChange(of: scenePhase) { oldPhase, newPhase in switch newPhase { ... } }</code> fires on every transition with both the old and new value handed to you. The three cases map cleanly onto Flutter's states: <code>.active</code> ≈ <code>resumed</code> (resume syncing here), <code>.background</code> ≈ <code>paused</code> (pause work and persist a draft, since the process may be suspended or killed at any point after this), and <code>.inactive</code> ≈ the brief transitional state (e.g. Control Center being pulled down) that usually needs no action, hence the empty <code>break</code>.</p></div></div></div></div>
         </div>
       </details>
 
@@ -2107,9 +2167,7 @@ struct YourAppNameApp: App {
       <details class="collapse">
         <summary><span>Protocol-based service + environment injection (the testable pattern)</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserServiceProtocol.swift — the abstraction, like an abstract repository</span></div>
-            <pre><code class="language-swift">protocol UserServiceProtocol {
+          <div class="code-wrap swift flip-card" id="flip-27"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserServiceProtocol.swift — the abstraction, like an abstract repository</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-27')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">protocol UserServiceProtocol {
     func fetchUser(id: Int) async throws -> User
 }
 
@@ -2123,11 +2181,9 @@ struct MockUserService: UserServiceProtocol {
     func fetchUser(id: Int) async throws -> User {
         User(id: id, name: "Test User", email: "test@example.com")
     }
-}</code></pre>
-          </div>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — depends on the protocol, not the concrete type</span></div>
-            <pre><code class="language-swift">@MainActor
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-27')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>protocol UserServiceProtocol { func fetchUser(id: Int) async throws -> User }</code> is Swift's interface mechanism — the direct sibling of an abstract Dart class (or a repository interface) that a Cubit depends on rather than a concrete implementation. <code>async throws</code> in the signature means any conforming type's implementation must also be async and can throw.</p>
+<p><code>LiveUserService</code> and <code>MockUserService</code> are two interchangeable concrete conformances: the real one calls <code>NetworkService.fetchUser(id:)</code> from the networking section above, and the fake one returns a canned <code>User</code> instantly with no network call at all — exactly the real-vs-fake repository pair you'd hand into a Cubit's constructor to make it unit-testable without hitting the network.</p></div></div></div></div>
+          <div class="code-wrap swift flip-card" id="flip-28"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>UserViewModel.swift — depends on the protocol, not the concrete type</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-28')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">@MainActor
 @Observable class UserViewModel {
     private let userService: UserServiceProtocol
     var user: User?
@@ -2147,8 +2203,8 @@ struct MockUserService: UserServiceProtocol {
 let vm = UserViewModel()
 
 // test — swap the dependency, no container needed
-let testVM = UserViewModel(userService: MockUserService())</code></pre>
-          </div>
+let testVM = UserViewModel(userService: MockUserService())</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-28')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This ViewModel depends on the <code>UserServiceProtocol</code> abstraction from the card above, not on <code>LiveUserService</code> directly — <code>private let userService: UserServiceProtocol</code> is typed as the protocol. <code>init(userService: UserServiceProtocol = LiveUserService())</code> is constructor injection with a default argument: production code calls <code>UserViewModel()</code> and silently gets the real service, while a test calls <code>UserViewModel(userService: MockUserService())</code> to swap it — the same idea as passing a repository into a Cubit's constructor, defaulted to the real implementation.</p>
+<p>Notice there's no DI container anywhere in this snippet — no <code>get_it</code>/<code>riverpod</code>/<code>provider</code> equivalent needed for this pattern to work. <code>@Environment</code> exists for genuinely app-wide dependencies (a logged-in session, a theme), but for a single service like this, plain constructor injection is simpler to trace and easier to test.</p></div></div></div></div>
         </div>
       </details>
 
@@ -2262,9 +2318,7 @@ let testVM = UserViewModel(userService: MockUserService())</code></pre>
         <summary><span>Fastlane — the one CI/CD tool that works the same for both stacks</span><span class="chev">▸</span></summary>
         <div class="inner">
           <p style="color:var(--text-muted); font-size:13.5px; margin:0 0 10px 0;">If your AppGenie pipeline already runs Fastlane for Android builds, the iOS half of that setup carries over almost unchanged — <code>match</code> for signing, <code>pilot</code> for TestFlight, <code>deliver</code> for App Store Connect metadata.</p>
-          <div class="code-wrap swift">
-            <div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>fastlane/Fastfile</span></div>
-            <pre><code class="language-swift">lane :beta do
+          <div class="code-wrap swift flip-card" id="flip-29"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span class="dots"><span></span><span></span><span></span></span><span>fastlane/Fastfile</span><button class="explain-btn" type="button" onclick="toggleExplain('flip-29')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">lane :beta do
   match(type: "appstore")                 # pulls signing certs from your shared repo
   build_app(scheme: "YourAppName")        # archives with the project's current Xcode
   upload_to_testflight(skip_waiting_for_build_processing: true)
@@ -2277,8 +2331,8 @@ lane :release do
     submit_for_review: true,
     automatic_release: false              # you flip the switch manually after review
   )
-end</code></pre>
-          </div>
+end</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-29')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the one tool in the whole document that's <strong>identical</strong> on both sides — if your AppGenie pipeline already runs Fastlane for the Android/Flutter build, this <code>Fastfile</code> slots in as the iOS half of the same setup, using the same Ruby-ish DSL and step functions (<code>match</code>, <code>build_app</code>, <code>upload_to_testflight</code>, <code>upload_to_app_store</code>) you may already recognize.</p>
+<p><code>lane :beta do ... end</code> and <code>lane :release do ... end</code> are named, runnable pipelines (<code>fastlane beta</code> / <code>fastlane release</code> from the CLI). <code>match(type: "appstore")</code> pulls signing certificates from a shared repo instead of managing provisioning profiles by hand; <code>build_app(scheme:)</code> archives the project; <code>upload_to_testflight</code>/<code>upload_to_app_store</code> ship the resulting build — <code>automatic_release: false</code> on the release lane means the build reaches App Store Connect but a human still flips the switch to actually publish it after review.</p></div></div></div></div>
         </div>
       </details>
 
@@ -2312,9 +2366,7 @@ end</code></pre>
         </div>
       </div>
 
-      <div class="code-wrap swift">
-        <div class="code-head"><span>ProfileView.swift — auto-fire on appear</span><span class="dots"><span></span><span></span><span></span></span></div>
-        <pre><code class="language-swift">struct ProfileView: View {
+      <div class="code-wrap swift flip-card" id="flip-30"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ProfileView.swift — auto-fire on appear</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-30')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct ProfileView: View {
     @State private var viewModel = ProfileViewModel()
 
     var body: some View {
@@ -2325,8 +2377,8 @@ end</code></pre>
                 await viewModel.fetchProfileData()
             }
     }
-}</code></pre>
-      </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-30')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p><code>.task { await viewModel.fetchProfileData() }</code> is SwiftUI's "run this async work when the view appears" modifier — the closest match is firing a Cubit's initial load inside <code>initState()</code>. The difference is that <code>.task</code> also gets cancellation for free: if the user navigates away while the request is still in flight, the underlying <code>Task</code> is cancelled automatically, no manual bookkeeping required.</p>
+<p>This is also the standard way to invoke an <code>async</code> function at all inside a SwiftUI view body, since — unlike Dart — a view's lifecycle hooks aren't <code>async</code> themselves; <code>.task {}</code> is one of the few places (along with wrapping a button action in <code>Task {}</code>) where SwiftUI opens an async context for you automatically.</p></div></div></div></div>
 
       <p style="color:var(--text-muted); font-size:14px;"><code>.task { }</code> is the closest match to firing a Cubit's initial load inside a screen's <code>initState()</code> — except it also handles cancellation for free.</p>
     </section>
@@ -2399,9 +2451,7 @@ end</code></pre>
       <details class="collapse" open>
         <summary><span>TodoItem.swift &amp; FetchState — data layer</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>Models</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">struct TodoItem: Identifiable {
+          <div class="code-wrap swift flip-card" id="flip-31"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>Models</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-31')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct TodoItem: Identifiable {
     let id = UUID()          // auto-managed row-tracking id
     let title: String
     var isCompleted: Bool
@@ -2413,17 +2463,15 @@ enum FetchState {
     case loading
     case success
     case error(message: String)   // associated value, like a Dart sealed class field
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-31')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>The data layer for the full worked reference screen. <code>struct TodoItem: Identifiable</code> mirrors a plain Dart model class, except <code>let id = UUID()</code> auto-generates a unique row identifier at construction time — comparable to assigning a <code>key:</code> yourself for a <code>ListView.builder</code>, except SwiftUI's <code>List</code>/<code>ForEach</code> require <code>Identifiable</code> conformance (or an explicit <code>id:</code> keypath) to diff rows efficiently, so this is done once, here.</p>
+<p><code>enum FetchState</code> is the state-machine enum this whole reference screen branches on — <code>.idle / .loading / .success / .error(message: String)</code> is the direct equivalent of a Dart sealed class (or a Freezed union) representing a Cubit's possible states, with <code>.error</code> carrying an associated <code>message</code> value the same way a sealed class's error variant would carry a field.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>TodoViewModel.swift — the Cubit</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>ViewModel · @MainActor + @Observable</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">@MainActor
+          <div class="code-wrap swift flip-card" id="flip-32"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>ViewModel · @MainActor + @Observable</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-32')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">@MainActor
 @Observable class TodoViewModel {
     var tasks: [TodoItem] = []
     var loadingState: FetchState = .idle
@@ -2460,17 +2508,15 @@ enum FetchState {
     deinit {
         print("ViewModel cleared from memory — zero manual close() calls.")
     }
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-32')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>This is the complete Cubit-equivalent for the reference screen: <code>@MainActor @Observable class TodoViewModel</code> holds three plain <code>var</code> properties as its entire state — <code>tasks</code>, <code>loadingState</code>, and <code>taskInputBuffer</code> — with no separate immutable state object and no <code>emit()</code> calls anywhere.</p>
+<p><code>loadRemoteTasks()</code> simulates a network round trip with <code>try await Task.sleep(nanoseconds: 1_200_000_000)</code> — Swift's equivalent of <code>await Future.delayed(Duration(milliseconds: 1200))</code> — then flips <code>loadingState</code> through the same <code>.loading → .success/.error</code> sequence you'd see in a real Cubit method. <code>addNewTask()</code> and <code>deleteItems(at:)</code> mutate <code>tasks</code> directly (array <code>.append</code> / <code>.remove(atOffsets:)</code>) rather than rebuilding a new immutable list via <code>copyWith</code>. Finally, <code>deinit { print(...) }</code> is a destructor that fires the instant ARC drops the last reference to this ViewModel — proof there's no manual <code>bloc.close()</code> step to remember; it just happens.</p></div></div></div></div>
         </div>
       </details>
 
       <details class="collapse">
         <summary><span>ProfileView.swift — root screen</span><span class="chev">▸</span></summary>
         <div class="inner">
-          <div class="code-wrap swift">
-            <div class="code-head"><span>Root view · state machine + list + form</span><span class="dots"><span></span><span></span><span></span></span></div>
-            <pre><code class="language-swift">struct ProfileView: View {
+          <div class="code-wrap swift flip-card" id="flip-33"><div class="flip-inner"><div class="flip-face flip-front"><div class="code-head"><span>Root view · state machine + list + form</span><span class="dots"><span></span><span></span><span></span></span><button class="explain-btn" type="button" onclick="toggleExplain('flip-33')" aria-label="Explain this code"><span class="explain-icon">◈</span><span class="explain-label">Explain</span></button></div><pre><code class="language-swift">struct ProfileView: View {
     @State private var viewModel = TodoViewModel()
 
     var body: some View {
@@ -2563,8 +2609,8 @@ struct TodoItemDetailView: View {
 
 #Preview {
     ProfileView()
-}</code></pre>
-          </div>
+}</code></pre></div><div class="flip-face flip-back"><div class="explain-back-head"><span class="explain-back-title">Explanation</span><button class="back-to-code-btn" type="button" onclick="toggleExplain('flip-33')" aria-label="Back to code"><span class="explain-icon">↺</span><span>Back to code</span></button></div><div class="explain-body"><p>The root screen tying the whole reference example together. <code>@Bindable var bindableModel = viewModel</code> is a small but important trick: <code>viewModel</code> itself is <code>@State</code>-owned (created once by this view), but to get <code>$</code>-prefixed two-way bindings into its properties for the <code>TextField</code>, it's re-wrapped locally as <code>@Bindable</code> right where it's needed — same instance, just viewed through a different property wrapper for binding purposes.</p>
+<p><code>Group { switch viewModel.loadingState { ... } }</code> is the BlocBuilder-equivalent state machine: each case of <code>FetchState</code> renders different UI — an empty state, a spinner, an error view, or the real list — exactly like a Flutter <code>BlocBuilder</code>'s builder callback switching on the current state. Inside <code>.success</code>, <code>ForEach(viewModel.tasks.indices, id: \.self)</code> iterates by <strong>index</strong> rather than by value, because <code>ForEach</code> loops normally hand you copies of value-type structs — iterating indices is what lets <code>viewModel.tasks[index].isCompleted.toggle()</code> actually write back into the source array. <code>.onDelete { viewModel.deleteItems(at: $0) }</code> wires up native swipe-to-delete, the built-in equivalent of a <code>Dismissible</code> wrapping each row in a <code>ListView.builder</code>. <code>NavigationLink(destination: TodoItemDetailView(...))</code> at the bottom pushes a detail screen per row using the inline-destination pattern from the navigation section.</p></div></div></div></div>
         </div>
       </details>
     </section>
@@ -2616,6 +2662,39 @@ struct TodoItemDetailView: View {
   })();
 
   hljs.highlightAll();
+
+  // flip-card explain toggle + height sync so front/back occupy the same box
+  function toggleExplain(id){
+    const wrap = document.getElementById(id);
+    if (!wrap) return;
+    wrap.classList.toggle('is-flipped');
+  }
+
+  (function(){
+    function syncFlipHeights(){
+      document.querySelectorAll('.code-wrap.flip-card').forEach((wrap) => {
+        const inner = wrap.querySelector('.flip-inner');
+        const front = wrap.querySelector('.flip-face.flip-front');
+        const back = wrap.querySelector('.flip-face.flip-back');
+        if (!inner || !front || !back) return;
+        const h = Math.max(front.offsetHeight, back.offsetHeight);
+        inner.style.height = h + 'px';
+      });
+    }
+    window.syncFlipHeights = syncFlipHeights;
+
+    // initial pass once everything (fonts, hljs) has rendered
+    window.addEventListener('load', syncFlipHeights);
+    // hljs already ran above, but run once more after layout settles
+    setTimeout(syncFlipHeights, 0);
+
+    // debounced re-measure on resize (code line-wrapping changes heights)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(syncFlipHeights, 150);
+    });
+  })();
 
   // copy-to-clipboard for every code block
   (function(){
